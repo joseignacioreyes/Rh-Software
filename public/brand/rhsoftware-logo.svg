@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 240" width="980" height="240">
+  <g transform="translate(20,20) scale(0.390625)">
+  <rect width="512" height="512" rx="112" fill="#1E3A8A"/>
+  <path d="M96 150 Q176 120 248 150 L248 392 Q176 362 96 392 Z" fill="#FFFFFF"/>
+  <path d="M416 150 Q336 120 264 150 L264 392 Q336 362 416 392 Z" fill="#DBEAFE"/>
+  <rect x="124" y="190" width="96" height="14" rx="7" fill="#93C5FD"/>
+  <rect x="124" y="228" width="96" height="14" rx="7" fill="#93C5FD"/>
+  <rect x="124" y="266" width="72" height="14" rx="7" fill="#93C5FD"/>
+  <rect x="124" y="304" width="96" height="14" rx="7" fill="#93C5FD"/>
+  <rect x="290" y="290" width="26" height="62" rx="6" fill="#1E3A8A"/>
+  <rect x="330" y="258" width="26" height="94" rx="6" fill="#1E3A8A"/>
+  <rect x="370" y="222" width="26" height="130" rx="6" fill="#1E3A8A"/>
+  <circle cx="392" cy="140" r="54" fill="#10B981" stroke="#1E3A8A" stroke-width="12"/>
+  <path d="M368 141 L386 159 L418 124" fill="none" stroke="#FFFFFF" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="250" y="138" font-family="Poppins, Inter, Arial, sans-serif" font-weight="700" font-size="104" fill="#1E3A8A">RH<tspan dx="24" fill="#059669">Software</tspan></text>
+  <text x="254" y="192" font-family="Poppins, Inter, Arial, sans-serif" font-weight="400" font-size="34" fill="#4B5563">Contabilidad y remuneraciones al día</text>
+</svg>
