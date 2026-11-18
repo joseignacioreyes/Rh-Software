@@ -12,6 +12,7 @@ import { guardarCartola, guardarDocumentosRcv, guardarHonorarios } from "../src/
 import { CUENTAS_CENTRALIZACION } from "../src/lib/centralizacion";
 import { calcularYGuardarF29 } from "../src/lib/servicios/f29";
 import { calcularLiquidacionesEmpresa } from "../src/lib/servicios/liquidaciones";
+import { construirArchivo, datosArchivosMes, registrarArchivo } from "../src/lib/servicios/archivos-legales";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const clave = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -396,11 +397,29 @@ async function main() {
     N("13222333-5", DEMO.empresas.transportes, 11, { anticipo: 100000 }),
     N("18777888-3", DEMO.empresas.almacen, 11, { bono_imponible: 20000 }),
   ]), "novedades");
+  // Licencia médica de Carla (octubre) y vacaciones de Rosa (septiembre).
+  revisar(await db.from("licencias").insert({ estudio_id: DEMO.estudio.id, empresa_id: DEMO.empresas.transportes, trabajador_id: id("13222333-5"), folio: "LM-0001-DEMO", tipo: "enfermedad", desde: "2026-10-06", hasta: "2026-10-12", rut_pagadora: "61603000-0", created_by: DEMO.ana.id }), "licencias");
+  revisar(await db.from("vacaciones").insert({ estudio_id: DEMO.estudio.id, empresa_id: DEMO.empresas.almacen, trabajador_id: id("18777888-3"), desde: "2026-09-07", hasta: "2026-09-17", dias_habiles: 8, created_by: DEMO.ana.id }), "vacaciones");
+  // Historial: los trabajadores antiguos tomaron 15 días hábiles cada febrero.
+  const historial = [["12111222-1", DEMO.empresas.transportes, 2019], ["13222333-5", DEMO.empresas.transportes, 2020], ["14333444-9", DEMO.empresas.transportes, 2017], ["18777888-3", DEMO.empresas.almacen, 2022]] as const;
+  const filasVac = historial.flatMap(([rut, empresa, desde]) =>
+    Array.from({ length: 2026 - desde }, (_, k) => ({ estudio_id: DEMO.estudio.id, empresa_id: empresa, trabajador_id: id(rut), desde: `${desde + k}-02-02`, hasta: `${desde + k}-02-20`, dias_habiles: 15, observaciones: "Feriado anual", created_by: DEMO.ana.id })));
+  revisar(await db.from("vacaciones").insert(filasVac), "historial de vacaciones");
   // Octubre: calculadas y aprobadas. Noviembre: novedades ingresadas, por calcular.
   for (const empresa of [DEMO.empresas.almacen, DEMO.empresas.transportes]) {
     const r = await calcularLiquidacionesEmpresa(db, empresa, DEMO.estudio.id, { anio: 2026, mes: 10 }, DEMO.ana.id);
     if (r.errores.length) throw new Error(`Liquidaciones: ${r.errores.join("; ")}`);
     revisar(await db.from("liquidaciones").update({ estado: "aprobada", aprobada_por: DEMO.ana.id, aprobada_at: "2026-11-05T15:00:00Z" }).eq("empresa_id", empresa).eq("anio", 2026).eq("mes", 10), "aprobar");
+  }
+
+  // Archivos Previred y LRE de octubre generados en el Almacén (en Transportes quedan pendientes: rojo en "Mi mes").
+  {
+    const r = await datosArchivosMes(db, DEMO.empresas.almacen, { anio: 2026, mes: 10 });
+    if ("error" in r) throw new Error(r.error);
+    for (const tipo of ["previred", "lre"] as const) {
+      const a = construirArchivo(tipo, r.datos);
+      await registrarArchivo(db, { estudioId: DEMO.estudio.id, empresaId: DEMO.empresas.almacen, tipo, periodo: { anio: 2026, mes: 10 }, nombre: a.nombre, contenido: Buffer.from(a.contenido, "latin1"), version: r.version, validacion: a.validacion, creadoPor: DEMO.ana.id });
+    }
   }
 
   // F29: agosto y septiembre declarados y pagados; octubre según el caso de cada empresa.

@@ -30,7 +30,12 @@ export default async function LayoutApp({ children }: LayoutProps<"/">) {
       titulo: "Remuneraciones",
       items: [
         { href: "/remuneraciones/liquidaciones", texto: "Liquidaciones del mes" },
+        { href: "/remuneraciones/previred", texto: "Archivo Previred" },
+        { href: "/remuneraciones/lre", texto: "Libro de Remuneraciones (LRE)" },
         { href: "/remuneraciones/trabajadores", texto: "Trabajadores" },
+        { href: "/remuneraciones/ausencias", texto: "Vacaciones y licencias" },
+        { href: "/remuneraciones/finiquitos", texto: "Finiquitos" },
+        { href: "/remuneraciones/documentos", texto: "Contratos y certificados" },
         { href: "/remuneraciones/parametros", texto: "Parámetros legales" },
       ],
     });
