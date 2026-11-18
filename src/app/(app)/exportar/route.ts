@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { obtenerContexto, permiso, leerPeriodo, type Modulo } from "@/lib/sesion";
+import { obtenerContexto, permiso, leerPeriodo, esCliente, type Modulo } from "@/lib/sesion";
 import { clienteServidor } from "@/lib/supabase/servidor";
 import { aCsv, aExcel, aPdf, hashContenido, TIPOS_CONTENIDO, type TablaExport } from "@/lib/exportar/tabla";
 import { cargarHonorarios, cargarLibro, csvImportadorSii, tablaHonorarios, tablaLibro } from "@/lib/libros";
@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
   const empresa = ctx.empresa;
   if (!empresa) return NextResponse.json({ error: "Elige una empresa" }, { status: 400 });
   const modulo: Modulo = "libros";
-  if (!permiso(ctx, empresa.id, modulo).ver) return NextResponse.json({ error: "Sin permiso" }, { status: 403 });
+  if (!permiso(ctx, empresa.id, modulo).ver && !esCliente(ctx, empresa.id)) return NextResponse.json({ error: "Sin permiso" }, { status: 403 });
 
   const supabase = await clienteServidor();
   let tabla: TablaExport;

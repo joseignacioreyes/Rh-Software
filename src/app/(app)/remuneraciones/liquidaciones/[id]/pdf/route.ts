@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import PDFDocument from "pdfkit";
-import { obtenerContexto, permiso, NOMBRES_MES } from "@/lib/sesion";
+import { obtenerContexto, permiso, esCliente, NOMBRES_MES } from "@/lib/sesion";
 import { clienteServidor } from "@/lib/supabase/servidor";
 import { formatearRut } from "@/lib/rut";
 import { formatoFecha, formatoPesos } from "@/lib/formato";
@@ -16,7 +16,8 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     .select("*, trabajadores(nombres, apellido_paterno, apellido_materno, rut, cargo, fecha_ingreso, tipo_contrato, afp, salud), empresas(razon_social, rut, direccion, comuna, representante_legal)")
     .eq("id", id)
     .maybeSingle();
-  if (!l || !permiso(ctx, l.empresa_id, "remuneraciones").ver) return NextResponse.json({ error: "No encontrada" }, { status: 404 });
+  // El cliente (portal) solo llega a liquidaciones aprobadas: lo asegura la base de datos (RLS).
+  if (!l || (!permiso(ctx, l.empresa_id, "remuneraciones").ver && !esCliente(ctx, l.empresa_id))) return NextResponse.json({ error: "No encontrada" }, { status: 404 });
   const { data: items } = await supabase.from("items_liquidacion").select("nombre, tipo, monto").eq("liquidacion_id", id).order("orden");
   const t = l.trabajadores as Record<string, string | null>;
   const e = l.empresas as Record<string, string | null>;

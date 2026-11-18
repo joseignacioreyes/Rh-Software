@@ -131,6 +131,44 @@ describe("permisos por rol dentro del estudio", () => {
   });
 });
 
+describe("portal del cliente y bandeja", () => {
+  it("el cliente solo ve liquidaciones aprobadas de su empresa", async () => {
+    const { data: una } = await admin.from("liquidaciones").select("id").eq("empresa_id", DEMO.empresas.almacen).eq("anio", 2026).eq("mes", 10).limit(1).single();
+    const r = await admin.from("liquidaciones").update({ estado: "calculada" }).eq("id", una!.id);
+    expect(r.error).toBeNull();
+    try {
+      const { data } = await cliente.from("liquidaciones").select("id, estado, empresa_id");
+      expect((data ?? []).length).toBeGreaterThan(0);
+      expect((data ?? []).map((l) => l.id)).not.toContain(una!.id);
+      expect((data ?? []).every((l) => l.estado === "aprobada" && l.empresa_id === DEMO.empresas.almacen)).toBe(true);
+    } finally {
+      await admin.from("liquidaciones").update({ estado: "aprobada" }).eq("id", una!.id);
+    }
+  });
+  it("el cliente no ve la bandeja ni las liquidaciones de otra empresa", async () => {
+    const b = await cliente.from("documentos_bandeja").select("id").eq("empresa_id", DEMO.empresas.transportes);
+    expect(b.data).toEqual([]);
+    const l = await cliente.from("liquidaciones").select("id").eq("empresa_id", DEMO.empresas.transportes);
+    expect(l.data).toEqual([]);
+  });
+  it("el cliente sube a la bandeja, pero no registra en los libros ni marca documentos como registrados", async () => {
+    const base = { estudio_id: DEMO.estudio.id, empresa_id: DEMO.empresas.almacen, nombre_archivo: "prueba.pdf", ruta_storage: "x/y/prueba.pdf" };
+    const ok = await cliente.from("documentos_bandeja").insert({ ...base, origen: "portal" }).select("id").single();
+    expect(ok.error).toBeNull();
+    const mal = await cliente.from("documentos_bandeja").insert({ ...base, origen: "portal", estado: "registrado" });
+    expect(mal.error).not.toBeNull();
+    const cambio = await cliente.from("documentos_bandeja").update({ estado: "registrado" }).eq("id", ok.data!.id).select("id");
+    expect(cambio.data ?? []).toEqual([]);
+    const rcv = await cliente.from("documentos_rcv").insert({ estudio_id: DEMO.estudio.id, empresa_id: DEMO.empresas.almacen, libro: "compras", anio: 2026, mes: 11, tipo_doc: 33, folio: "1", rut_contraparte: "76555666-K", fecha_docto: "2026-11-01" });
+    expect(rcv.error).not.toBeNull();
+    await admin.from("documentos_bandeja").delete().eq("id", ok.data!.id);
+  });
+  it("el asistente sin permiso de documentos no ve la bandeja", async () => {
+    const { data } = await luis.from("documentos_bandeja").select("id");
+    expect(data).toEqual([]);
+  });
+});
+
 describe("superadministrador", () => {
   it("no ve la contabilidad de las empresas sin autorización registrada", async () => {
     const e = await superadmin.from("empresas").select("id");

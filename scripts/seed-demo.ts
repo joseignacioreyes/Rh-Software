@@ -1,6 +1,7 @@
 // Perfil de ejemplo: Estudio Contable Demo (todo ficticio).
 // Uso: npm run seed:demo
 // Se puede volver a correr: borra el estudio demo y lo crea de nuevo, siempre igual.
+import { readFileSync } from "node:fs";
 import { createClient } from "@supabase/supabase-js";
 import { DEMO } from "../src/lib/demo";
 import { generarArchivosDemo, RUT_EMPRESAS } from "./demo-archivos";
@@ -236,6 +237,7 @@ async function main() {
   await asegurarUsuario(DEMO.ana, false);
   await asegurarUsuario(DEMO.luis, false);
   await asegurarUsuario(DEMO.visitante, false);
+  await asegurarUsuario(DEMO.cliente, false);
 
   // 3. Estudio y empresas.
   revisar(await db.from("estudios").insert({
@@ -274,6 +276,8 @@ async function main() {
   revisar(await db.from("membresias").insert([
     { usuario_id: DEMO.ana.id, estudio_id: DEMO.estudio.id, rol: "contador", permisos: {}, created_by: DEMO.ana.id },
     { usuario_id: DEMO.visitante.id, estudio_id: DEMO.estudio.id, rol: "lector", permisos: {}, created_by: DEMO.ana.id },
+    // José Pérez, dueño del Almacén: solo el portal del cliente.
+    { usuario_id: DEMO.cliente.id, estudio_id: DEMO.estudio.id, empresa_id: DEMO.empresas.almacen, rol: "cliente", permisos: {}, created_by: DEMO.ana.id },
     ...[DEMO.empresas.almacen, DEMO.empresas.transportes].map((empresa_id) => ({
       usuario_id: DEMO.luis.id, estudio_id: DEMO.estudio.id, empresa_id, rol: "asistente",
       permisos: { contabilidad: false, libros: false, impuestos: false, remuneraciones: true, documentos: false },
@@ -428,12 +432,38 @@ async function main() {
       if (mes === 10 && clave === "transportes") continue; // le faltan los libros de octubre
       const r = await calcularYGuardarF29(db, { id: empresaId }, DEMO.estudio.id, { anio: 2026, mes });
       if (r.error) throw new Error(`F29 ${clave} ${mes}: ${r.error}`);
-      const estado = mes < 10 ? "pagado" : clave === "consultora" ? "revisado" : "borrador";
+      const estado = mes < 10 ? "pagado" : clave === "almacen" ? "revisado" : "borrador"; // el Almacén ve "debes pagar" en su portal
       const cambios: Record<string, unknown> = { estado, created_by: DEMO.ana.id };
       if (estado !== "borrador") Object.assign(cambios, { revisado_por: DEMO.ana.id, revisado_at: `2026-${String(mes + 1).padStart(2, "0")}-15T15:00:00Z` });
       if (estado === "pagado") Object.assign(cambios, { declarado_at: `2026-${String(mes + 1).padStart(2, "0")}-18T15:00:00Z`, folio_declaracion: `${8_000_000 + mes * 1000 + clave.length}`, monto_pagado: r.resultado!.totalAPagar });
       revisar(await db.from("f29_propuestas").update(cambios).eq("empresa_id", empresaId).eq("anio", 2026).eq("mes", mes), "estado F29");
     }
+  }
+
+  // Bandeja de documentos: 2 documentos subidos por el cliente del Almacén y una solicitud pendiente.
+  {
+    const base = `${DEMO.estudio.id}/${DEMO.empresas.almacen}/bandeja`;
+    const docs = [
+      { archivo: "foto-factura-ferreteria.png", mime: "image/png", comentario: "Compré estanterías para la bodega", creado: "2026-11-07T13:20:00Z",
+        datos: { tipo_documento: "factura", codigo_sii: 33, folio: "4521", fecha: "2026-11-06", rut_emisor: "76555666-K", razon_social_emisor: "Ferretería El Clavo Demo Ltda.", monto_neto: 84000, monto_exento: 0, monto_iva: 15960, monto_total: 99960, cuenta_sugerida: "Muebles y útiles", confianza: "alta" } },
+      { archivo: "factura-distribuidora-sur.pdf", mime: "application/pdf", comentario: null, creado: "2026-11-08T10:05:00Z",
+        datos: { tipo_documento: "factura", codigo_sii: 33, folio: "110007", fecha: "2026-10-11", rut_emisor: "76543210-3", razon_social_emisor: "Distribuidora Sur Demo SpA", monto_neto: 324760, monto_exento: 0, monto_iva: 61704, monto_total: 386464, cuenta_sugerida: "Compras de mercaderías", confianza: "alta" } },
+    ];
+    for (const d of docs) {
+      const ruta = `${base}/${d.archivo}`;
+      const subida = await db.storage.from("archivos").upload(ruta, readFileSync(`demo/bandeja/${d.archivo}`), { contentType: d.mime, upsert: true });
+      if (subida.error) throw new Error(`Bandeja: ${subida.error.message}`);
+      const dup = await db.from("documentos_rcv").select("id").eq("empresa_id", DEMO.empresas.almacen).eq("tipo_doc", 33).eq("folio", d.datos.folio).eq("rut_contraparte", d.datos.rut_emisor).maybeSingle();
+      revisar(await db.from("documentos_bandeja").insert({
+        estudio_id: DEMO.estudio.id, empresa_id: DEMO.empresas.almacen, origen: "portal", nombre_archivo: d.archivo, ruta_storage: ruta,
+        tipo_mime: d.mime, comentario: d.comentario, datos: d.datos, leido_con: "ejemplo", duplicado_de: dup.data?.id ?? null,
+        created_at: d.creado, created_by: DEMO.cliente.id,
+      }), "bandeja");
+    }
+    revisar(await db.from("solicitudes_cliente").insert({
+      estudio_id: DEMO.estudio.id, empresa_id: DEMO.empresas.almacen, titulo: "Envíame las facturas de compra de noviembre que tengas en papel",
+      detalle: "Sácales una foto con el celular y súbelas aquí. Las necesito antes del día 10 para tu IVA.", created_by: DEMO.ana.id, created_at: "2026-11-09T12:00:00Z",
+    }), "solicitud");
   }
 
   console.log("Listo. Ingresa con RUT 15.111.222-6 y clave Demo1234 (Ana Demo).");

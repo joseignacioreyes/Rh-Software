@@ -167,6 +167,16 @@ export function permiso(ctx: Contexto, empresaId: string, modulo: Modulo): { ver
   return { ver: tiene, editar: tiene };
 }
 
+/** ¿Es cliente (portal) de la empresa? */
+export function esCliente(ctx: Contexto, empresaId: string) {
+  return ctx.membresiasEmpresa.some((m) => m.empresa_id === empresaId && m.rol === "cliente");
+}
+
+/** Solo tiene acceso como cliente (sin rol de estudio ni de asistente): usa el portal. */
+export function soloCliente(ctx: Contexto) {
+  return !ctx.rolEstudio && ctx.membresiasEmpresa.length > 0 && ctx.membresiasEmpresa.every((m) => m.rol === "cliente");
+}
+
 export function esContador(ctx: Contexto) {
   return ctx.rolEstudio === "contador";
 }

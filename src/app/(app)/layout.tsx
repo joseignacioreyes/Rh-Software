@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { obtenerContexto, esContador, permiso } from "@/lib/sesion";
+import { redirect } from "next/navigation";
+import { obtenerContexto, esContador, permiso, soloCliente } from "@/lib/sesion";
 import { BarraLateral, type GrupoMenu } from "@/components/app/BarraLateral";
 import { SelectorEmpresa } from "@/components/app/SelectorEmpresa";
 import { SelectorPeriodo } from "@/components/app/SelectorPeriodo";
@@ -15,13 +16,20 @@ const NOMBRE_ROL: Record<string, string> = {
 
 export default async function LayoutApp({ children }: LayoutProps<"/">) {
   const ctx = await obtenerContexto();
+  // Los clientes de las empresas usan el portal (más simple y apto para celular).
+  if (soloCliente(ctx)) redirect("/portal");
   const contador = esContador(ctx);
   const verContabilidad = ctx.empresa ? permiso(ctx, ctx.empresa.id, "contabilidad").ver : false;
   const verLibros = ctx.empresa ? permiso(ctx, ctx.empresa.id, "libros").ver : false;
   const verImpuestos = ctx.empresa ? permiso(ctx, ctx.empresa.id, "impuestos").ver : false;
   const verRemuneraciones = ctx.empresa ? permiso(ctx, ctx.empresa.id, "remuneraciones").ver : false;
+  const verDocumentos = ctx.empresa ? permiso(ctx, ctx.empresa.id, "documentos").ver : false;
 
-  const grupos: GrupoMenu[] = [{ items: [{ href: "/mi-mes", texto: "Mi mes" }, { href: "/impuestos/calendario", texto: "Calendario" }] }];
+  const grupos: GrupoMenu[] = [{ items: [
+    { href: "/mi-mes", texto: "Mi mes" },
+    { href: "/impuestos/calendario", texto: "Calendario" },
+    ...(verDocumentos ? [{ href: "/documentos", texto: "Bandeja de documentos" }] : []),
+  ] }];
   if (verImpuestos) {
     grupos.push({ titulo: "Impuestos", items: [{ href: "/impuestos/f29", texto: "F29 del mes" }] });
   }

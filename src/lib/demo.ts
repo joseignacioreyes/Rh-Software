@@ -22,6 +22,13 @@ export const DEMO = {
     nombre: "Visitante Demo",
     correo: "visitante.demo@demo.rhsoftware.cl",
   },
+  // Cliente del Almacén: entra al portal del cliente.
+  cliente: {
+    id: "00000000-0000-4000-8000-0000000000a4",
+    rut: "13444555-6",
+    nombre: "José Pérez Demo",
+    correo: "jose.perez@demo.rhsoftware.cl",
+  },
   empresas: {
     almacen: "00000000-0000-4000-8000-0000000000e1",
     transportes: "00000000-0000-4000-8000-0000000000e2",
