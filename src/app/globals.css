@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+/*
+ * Marca RH Software: colores y tipografías.
+ * Los nombres se usan en Tailwind como bg-azul, text-verde, border-rojo, etc.
+ */
+@theme {
+  /* Azul principal: barra lateral, encabezados y botones principales */
+  --color-azul: #1e3a8a;
+  --color-azul-oscuro: #172e6e;
+  /* Verde: "al día", "listo", "cuadra" */
+  --color-verde: #059669;
+  /* Celeste: fondos suaves y filas seleccionadas */
+  --color-celeste: #dbeafe;
+  /* Rojo: "atrasado", "no cuadra" o error */
+  --color-rojo: #dc2626;
+  /* Ámbar: "por vencer" o "revisar" */
+  --color-ambar: #d97706;
+  /* Textos */
+  --color-texto: #111827;
+  --color-texto-suave: #4b5563;
+  /* Fondos */
+  --color-fondo: #ffffff;
+  --color-fondo-suave: #f9fafb;
+  --color-borde: #e5e7eb;
+
+  /* Inter para todo el contenido; Poppins solo para títulos */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-titulo: var(--font-poppins), var(--font-inter), ui-sans-serif, sans-serif;
+}
+
+body {
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  font-family: var(--font-sans);
+}
+
+/* Los títulos usan Poppins */
+h1,
+h2,
+h3 {
+  font-family: var(--font-titulo);
+}
+
+/* Números tabulares en tablas y montos, para que las cifras queden alineadas */
+table,
+.numeros {
+  font-variant-numeric: tabular-nums;
+}
