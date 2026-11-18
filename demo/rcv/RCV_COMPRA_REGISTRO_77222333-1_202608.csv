@@ -1,0 +1,11 @@
+Nro;Tipo Doc;Tipo Compra;RUT Proveedor;Razon Social;Folio;Fecha Docto;Fecha Recepcion;Fecha Acuse;Monto Exento;Monto Neto;Monto IVA Recuperable;Monto Iva No Recuperable;Codigo IVA No Rec.;Monto Total;Monto Neto Activo Fijo;IVA Activo Fijo;IVA uso Comun;Impto. Sin Derecho a Credito;IVA No Retenido;Tabacos Puros;Tabacos Cigarrillos;Tabacos Elaborados;NCE o NDE sobre Fact. de Compra;Codigo Otro Impuesto;Valor Otro Impuesto;Tasa Otro Impuesto
+1;33;Del Giro;96222333-8;Combustibles del Norte Demo S.A.;108011;27/08/2026;28/08/2026 10:15:00;;0;680260;129249;0;;809509;0;0;0;0;0;;;;0;;;
+2;33;Del Giro;76222111-K;Neumáticos Ruta Demo SpA;108018;25/08/2026;26/08/2026 10:15:00;;0;241770;45936;0;;287706;0;0;0;0;0;;;;0;;;
+3;33;Del Giro;77333222-3;Taller Mecánico Los Andes Demo;108025;07/08/2026;08/08/2026 10:15:00;;0;183500;34865;0;;218365;0;0;0;0;0;;;;0;;;
+4;61;Del Giro;96333444-3;Autopistas Demo S.A.;108032;17/08/2026;18/08/2026 10:15:00;;0;359970;68394;0;;428364;0;0;0;0;0;;;;0;;;
+5;33;Del Giro;96222333-8;Combustibles del Norte Demo S.A.;108039;16/08/2026;17/08/2026 10:15:00;;0;608080;115535;0;;723615;0;0;0;0;0;;;;0;;;
+6;33;Del Giro;76222111-K;Neumáticos Ruta Demo SpA;108046;15/08/2026;16/08/2026 10:15:00;;0;510000;96900;0;;606900;0;0;0;0;0;;;;0;;;
+7;33;Del Giro;77333222-3;Taller Mecánico Los Andes Demo;108053;11/08/2026;12/08/2026 10:15:00;;0;740880;140767;0;;881647;0;0;0;0;0;;;;0;;;
+8;33;Del Giro;96333444-3;Autopistas Demo S.A.;108060;28/08/2026;29/08/2026 10:15:00;;0;954780;181408;0;;1136188;0;0;0;0;0;;;;0;;;
+9;33;Del Giro;96222333-8;Combustibles del Norte Demo S.A.;108067;29/08/2026;30/08/2026 10:15:00;;0;262050;49790;0;;311840;0;0;0;0;0;;;;0;;;
+10;33;Del Giro;76222111-K;Neumáticos Ruta Demo SpA;108074;25/08/2026;26/08/2026 10:15:00;;0;663720;126107;0;;789827;0;0;0;0;0;;;;0;;;

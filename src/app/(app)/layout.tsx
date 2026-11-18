@@ -17,8 +17,21 @@ export default async function LayoutApp({ children }: LayoutProps<"/">) {
   const ctx = await obtenerContexto();
   const contador = esContador(ctx);
   const verContabilidad = ctx.empresa ? permiso(ctx, ctx.empresa.id, "contabilidad").ver : false;
+  const verLibros = ctx.empresa ? permiso(ctx, ctx.empresa.id, "libros").ver : false;
 
   const grupos: GrupoMenu[] = [{ items: [{ href: "/mi-mes", texto: "Mi mes" }] }];
+  if (verLibros) {
+    grupos.push({
+      titulo: "Libros",
+      items: [
+        { href: "/libros/importar", texto: "Importar del SII" },
+        { href: "/libros/compras", texto: "Compras" },
+        { href: "/libros/ventas", texto: "Ventas" },
+        { href: "/libros/honorarios", texto: "Honorarios" },
+        { href: "/libros/mapeo", texto: "Otros softwares (Excel)" },
+      ],
+    });
+  }
   if (verContabilidad) {
     grupos.push({
       titulo: "Contabilidad",
@@ -29,6 +42,8 @@ export default async function LayoutApp({ children }: LayoutProps<"/">) {
         { href: "/contabilidad/libro-mayor", texto: "Libro mayor" },
         { href: "/contabilidad/balance", texto: "Balance 8 columnas" },
         { href: "/contabilidad/estado-resultados", texto: "Estado de resultados" },
+        { href: "/contabilidad/centralizacion", texto: "Centralizaciones" },
+        { href: "/bancos", texto: "Bancos y conciliación" },
         { href: "/contabilidad/cierre", texto: "Cierre de periodo" },
       ],
     });

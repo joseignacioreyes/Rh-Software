@@ -3,6 +3,13 @@
 // Se puede volver a correr: borra el estudio demo y lo crea de nuevo, siempre igual.
 import { createClient } from "@supabase/supabase-js";
 import { DEMO } from "../src/lib/demo";
+import { generarArchivosDemo, RUT_EMPRESAS } from "./demo-archivos";
+import { decodificar, leerCsv } from "../src/lib/importar/csv";
+import { leerRcv } from "../src/lib/importar/rcv";
+import { leerHonorarios } from "../src/lib/importar/honorarios";
+import { aplicarMapeoCartola, sugerirMapeo } from "../src/lib/importar/mapeo";
+import { guardarCartola, guardarDocumentosRcv, guardarHonorarios } from "../src/lib/importar/guardar";
+import { CUENTAS_CENTRALIZACION } from "../src/lib/centralizacion";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const clave = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -285,11 +292,28 @@ async function main() {
       { estudio_id: DEMO.estudio.id, empresa_id: empresaId, codigo: "OPE", nombre: "Operaciones", created_by: DEMO.ana.id },
     ]), "centros de costo");
 
+    // Movimientos de la cartola de octubre: 8 de 12 ya están contabilizados (para que la conciliación sugiera pareos).
+    const archivos = generarArchivosDemo().filter((a) => a.empresa === clave);
+    const cartolaOct = archivos.find((a) => a.tipo === "cartola" && a.mes === 10)!;
+    const filasCartola = leerCsv(decodificar(cartolaOct.contenido).texto);
+    const mapeoCartola = sugerirMapeo("cartola", filasCartola[0]);
+    const movsOct = aplicarMapeoCartola(filasCartola.slice(1), mapeoCartola).movimientos;
+    const delBanco: Comprobante[] = movsOct.slice(0, 8).map((m) => ({
+      tipo: m.monto > 0 ? "ingreso" : "egreso",
+      fecha: m.fecha,
+      glosa: `${m.monto > 0 ? "Depósito" : "Pago"} ${m.descripcion.toLowerCase()} doc. ${m.documento}`,
+      lineas: m.monto > 0
+        ? [["1.1.01.003", m.monto, 0], ["1.1.03.001", 0, m.monto]]
+        : [["2.1.02.001", -m.monto, 0], ["1.1.01.003", 0, -m.monto]],
+    }));
+
     const comprobantes: Comprobante[] = [
       { tipo: "apertura", fecha: "2026-08-01", glosa: "Saldos iniciales (migración desde sistema anterior)", lineas: APERTURAS[clave] },
       ...[8, 9, 10].flatMap((mes) => generadores[clave](mes)),
+      ...delBanco,
     ];
     const n = await crearComprobantes(empresaId, comprobantes);
+    const cuentasEmpresa = revisar<{ id: string; codigo: string }[]>(await db.from("plan_cuentas").select("id, codigo").eq("empresa_id", empresaId), "cuentas");
 
     // Agosto y septiembre cerrados; octubre abierto.
     revisar(await db.from("periodos").insert([
@@ -297,7 +321,50 @@ async function main() {
       { estudio_id: DEMO.estudio.id, empresa_id: empresaId, anio: 2026, mes: 9, estado: "cerrado", cerrado_at: "2026-10-14T15:00:00Z", cerrado_por: DEMO.ana.id, created_by: DEMO.ana.id },
       { estudio_id: DEMO.estudio.id, empresa_id: empresaId, anio: 2026, mes: 10, estado: "abierto", created_by: DEMO.ana.id },
     ]), "periodos");
-    console.log(`  ${clave}: ${plantilla.length} cuentas, ${n} comprobantes`);
+    // Libros del SII: agosto y septiembre importados en todas; octubre falta en Transportes Cordillera.
+    const base = { supabase: db, estudioId: DEMO.estudio.id, empresaId, creadoPor: DEMO.ana.id };
+    let docsImportados = 0;
+    for (const a of archivos) {
+      if (a.mes === 10 && clave === "transportes" && a.tipo.startsWith("rcv")) continue;
+      const texto = decodificar(a.contenido).texto;
+      if (a.tipo === "rcv_compras" || a.tipo === "rcv_ventas") {
+        const r = leerRcv(texto, a.nombre);
+        if (r.documentos.length) {
+          await guardarDocumentosRcv({ ...base, nombreArchivo: a.nombre }, r.libro!, r.documentos, r.errores, { anio: r.anio, mes: r.mes });
+          docsImportados += r.documentos.length;
+        }
+      } else if (a.tipo === "honorarios_recibidos") {
+        const h = leerHonorarios(leerCsv(texto));
+        await guardarHonorarios({ ...base, nombreArchivo: a.nombre }, "recibidas", h.boletas, h.errores);
+      }
+    }
+    // El almacén vende con boletas: resumen mensual de boletas (valores ficticios).
+    if (clave === "almacen") {
+      for (const mes of [8, 9, 10]) {
+        const neto = variar(6_200_000, mes);
+        const fin = new Date(Date.UTC(2026, mes, 0)).toISOString().slice(0, 10);
+        revisar(await db.from("documentos_rcv").insert({
+          estudio_id: DEMO.estudio.id, empresa_id: empresaId, libro: "ventas", anio: 2026, mes, tipo_doc: 39,
+          folio: `RESUMEN-2026${String(mes).padStart(2, "0")}`, rut_contraparte: "66666666-6", razon_social: "Resumen de boletas del mes",
+          fecha_docto: fin, monto_neto: neto, monto_iva: iva(neto), monto_total: neto + iva(neto), cantidad_documentos: 1100 + mes * 13,
+          origen: "resumen_boletas", created_by: DEMO.ana.id,
+        }), "resumen de boletas");
+      }
+    }
+
+    // Cuenta bancaria, cartola de octubre importada y cuentas de centralización configuradas.
+    const porCodigo = new Map(cuentasEmpresa.map((c) => [c.codigo, c.id]));
+    const cuentaBanco = revisar<{ id: string }>(await db.from("cuentas_bancarias").insert({
+      estudio_id: DEMO.estudio.id, empresa_id: empresaId, banco: "Banco Demo", numero: `00-${RUT_EMPRESAS[clave].slice(0, 6)}`,
+      cuenta_contable_id: porCodigo.get("1.1.01.003"), created_by: DEMO.ana.id,
+    }).select("id").single(), "cuenta bancaria");
+    await guardarCartola({ ...base, nombreArchivo: cartolaOct.nombre }, cuentaBanco.id, movsOct, [], mapeoCartola);
+    revisar(await db.from("config_centralizacion").insert({
+      empresa_id: empresaId, estudio_id: DEMO.estudio.id,
+      cuentas: Object.fromEntries(CUENTAS_CENTRALIZACION.map((c) => [c.clave, porCodigo.get(c.codigo)])),
+    }), "config centralización");
+
+    console.log(`  ${clave}: ${plantilla.length} cuentas, ${n} comprobantes, ${docsImportados} documentos RCV, ${movsOct.length} movimientos bancarios`);
   }
 
   console.log("Listo. Ingresa con RUT 15.111.222-6 y clave Demo1234 (Ana Demo).");

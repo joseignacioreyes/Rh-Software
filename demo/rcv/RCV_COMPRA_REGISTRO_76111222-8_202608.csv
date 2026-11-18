@@ -1,0 +1,15 @@
+Nro;Tipo Doc;Tipo Compra;RUT Proveedor;Razon Social;Folio;Fecha Docto;Fecha Recepcion;Fecha Acuse;Monto Exento;Monto Neto;Monto IVA Recuperable;Monto Iva No Recuperable;Codigo IVA No Rec.;Monto Total;Monto Neto Activo Fijo;IVA Activo Fijo;IVA uso Comun;Impto. Sin Derecho a Credito;IVA No Retenido;Tabacos Puros;Tabacos Cigarrillos;Tabacos Elaborados;NCE o NDE sobre Fact. de Compra;Codigo Otro Impuesto;Valor Otro Impuesto;Tasa Otro Impuesto
+1;33;Del Giro;76543210-3;Distribuidora Sur Demo SpA;108007;26/08/2026;27/08/2026 10:15:00;;0;495880;94217;0;;590097;0;0;0;0;0;;;;0;;;
+2;33;Del Giro;77654321-7;Lácteos del Valle Demo Ltda.;108014;14/08/2026;15/08/2026 10:15:00;;0;668070;126933;0;;795003;0;0;0;0;0;;;;0;;;
+3;33;Del Giro;78765432-0;Bebidas Andinas Demo S.A.;108021;27/08/2026;28/08/2026 10:15:00;;0;696110;132261;0;;828371;0;0;0;0;0;;;;0;;;
+4;61;Del Giro;76987654-5;Panificadora La Espiga Demo;108028;16/08/2026;17/08/2026 10:15:00;;0;586680;111469;0;;698149;0;0;0;0;0;;;;0;;;
+5;33;Del Giro;96111222-2;Compañía Eléctrica Demo S.A.;108035;28/08/2026;29/08/2026 10:15:00;;0;557510;105927;0;;663437;0;0;0;0;0;;;;0;;;
+6;33;Del Giro;76543210-3;Distribuidora Sur Demo SpA;108042;13/08/2026;14/08/2026 10:15:00;;0;523390;99444;0;;622834;0;0;0;0;0;;;;0;;;
+7;33;Del Giro;77654321-7;Lácteos del Valle Demo Ltda.;108049;14/08/2026;15/08/2026 10:15:00;;0;700000;133000;0;;833000;0;0;0;0;0;;;;0;;;
+8;33;Del Giro;78765432-0;Bebidas Andinas Demo S.A.;108056;05/08/2026;06/08/2026 10:15:00;;0;545480;103641;0;;649121;0;0;0;0;0;;;;0;;;
+9;33;Del Giro;76987654-5;Panificadora La Espiga Demo;108063;10/08/2026;11/08/2026 10:15:00;;0;515220;97892;0;;613112;0;0;0;0;0;;;;0;;;
+10;33;Del Giro;96111222-2;Compañía Eléctrica Demo S.A.;108070;20/08/2026;21/08/2026 10:15:00;;0;540370;102670;0;;643040;0;0;0;0;0;;;;0;;;
+11;33;Del Giro;76543210-3;Distribuidora Sur Demo SpA;108077;27/08/2026;28/08/2026 10:15:00;;0;586230;111384;0;;697614;0;0;0;0;0;;;;0;;;
+12;33;Del Giro;77654321-7;Lácteos del Valle Demo Ltda.;108084;09/08/2026;10/08/2026 10:15:00;;0;639990;121598;0;;761588;0;0;0;0;0;;;;0;;;
+13;33;Del Giro;78765432-0;Bebidas Andinas Demo S.A.;108091;13/08/2026;14/08/2026 10:15:00;;0;597080;113445;0;;710525;0;0;0;0;0;;;;0;;;
+14;33;Del Giro;76987654-5;Panificadora La Espiga Demo;108098;01/08/2026;02/08/2026 10:15:00;;0;342470;65069;0;;407539;0;0;0;0;0;;;;0;;;

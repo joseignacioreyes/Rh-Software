@@ -1,0 +1,6 @@
+Nro;Tipo Doc;Tipo Compra;RUT Proveedor;Razon Social;Folio;Fecha Docto;Fecha Recepcion;Fecha Acuse;Monto Exento;Monto Neto;Monto IVA Recuperable;Monto Iva No Recuperable;Codigo IVA No Rec.;Monto Total;Monto Neto Activo Fijo;IVA Activo Fijo;IVA uso Comun;Impto. Sin Derecho a Credito;IVA No Retenido;Tabacos Puros;Tabacos Cigarrillos;Tabacos Elaborados;NCE o NDE sobre Fact. de Compra;Codigo Otro Impuesto;Valor Otro Impuesto;Tasa Otro Impuesto
+1;33;Del Giro;76444555-4;Arriendos Oficina Demo SpA;110010;09/10/2026;10/10/2026 10:15:00;;0;126600;24054;0;;150654;0;0;0;0;0;;;;0;;;
+2;33;Del Giro;96444555-9;Telefonía Demo S.A.;110017;07/10/2026;08/10/2026 10:15:00;;0;260010;49402;0;;309412;0;0;0;0;0;;;;0;;;
+3;33;Activo Fijo;76555666-K;Computación Demo Ltda.;110024;02/10/2026;03/10/2026 10:15:00;;0;297820;56586;0;;354406;297820;56586;0;0;0;;;;0;;;
+4;33;Del Giro;76444555-4;Arriendos Oficina Demo SpA;110031;01/10/2026;02/10/2026 10:15:00;;0;297780;56578;0;;354358;0;0;0;0;0;;;;0;;;
+5;33;Del Giro;96444555-9;Telefonía Demo S.A.;110038;09/10/2026;10/10/2026 10:15:00;;0;405020;76954;0;;481974;0;0;0;0;0;;;;0;;;

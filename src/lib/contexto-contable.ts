@@ -1,14 +1,19 @@
 import "server-only";
 import { redirect } from "next/navigation";
-import { obtenerContexto, permiso } from "@/lib/sesion";
+import { obtenerContexto, permiso, type Modulo } from "@/lib/sesion";
 import { clienteServidor } from "@/lib/supabase/servidor";
 import { compararCodigos, type Cuenta } from "@/lib/contabilidad";
 
 /** Contexto común de las pantallas de contabilidad: empresa elegida y permisos. */
 export async function contextoContable() {
+  return contextoModulo("contabilidad");
+}
+
+/** Contexto de una pantalla de un módulo (contabilidad, libros, impuestos, remuneraciones, documentos). */
+export async function contextoModulo(modulo: Modulo) {
   const ctx = await obtenerContexto();
   if (!ctx.empresa) redirect("/mi-mes");
-  const p = permiso(ctx, ctx.empresa.id, "contabilidad");
+  const p = permiso(ctx, ctx.empresa.id, modulo);
   if (!p.ver) redirect("/mi-mes");
   const supabase = await clienteServidor();
   return { ctx, empresa: ctx.empresa, puedeEditar: p.editar, supabase };
