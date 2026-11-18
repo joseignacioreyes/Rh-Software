@@ -10,6 +10,7 @@ import { leerHonorarios } from "../src/lib/importar/honorarios";
 import { aplicarMapeoCartola, sugerirMapeo } from "../src/lib/importar/mapeo";
 import { guardarCartola, guardarDocumentosRcv, guardarHonorarios } from "../src/lib/importar/guardar";
 import { CUENTAS_CENTRALIZACION } from "../src/lib/centralizacion";
+import { calcularYGuardarF29 } from "../src/lib/servicios/f29";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const clave = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -325,7 +326,8 @@ async function main() {
     const base = { supabase: db, estudioId: DEMO.estudio.id, empresaId, creadoPor: DEMO.ana.id };
     let docsImportados = 0;
     for (const a of archivos) {
-      if (a.mes === 10 && clave === "transportes" && a.tipo.startsWith("rcv")) continue;
+      // Transportes Cordillera: en octubre llegaron solo las compras (y faltan 3 facturas); las ventas no.
+      if (a.mes === 10 && clave === "transportes" && a.tipo === "rcv_ventas") continue;
       const texto = decodificar(a.contenido).texto;
       if (a.tipo === "rcv_compras" || a.tipo === "rcv_ventas") {
         const r = leerRcv(texto, a.nombre);
@@ -365,6 +367,20 @@ async function main() {
     }), "config centralización");
 
     console.log(`  ${clave}: ${plantilla.length} cuentas, ${n} comprobantes, ${docsImportados} documentos RCV, ${movsOct.length} movimientos bancarios`);
+  }
+
+  // F29: agosto y septiembre declarados y pagados; octubre según el caso de cada empresa.
+  for (const [clave, empresaId] of Object.entries(DEMO.empresas)) {
+    for (const mes of [8, 9, 10]) {
+      if (mes === 10 && clave === "transportes") continue; // le faltan los libros de octubre
+      const r = await calcularYGuardarF29(db, { id: empresaId }, DEMO.estudio.id, { anio: 2026, mes });
+      if (r.error) throw new Error(`F29 ${clave} ${mes}: ${r.error}`);
+      const estado = mes < 10 ? "pagado" : clave === "consultora" ? "revisado" : "borrador";
+      const cambios: Record<string, unknown> = { estado, created_by: DEMO.ana.id };
+      if (estado !== "borrador") Object.assign(cambios, { revisado_por: DEMO.ana.id, revisado_at: `2026-${String(mes + 1).padStart(2, "0")}-15T15:00:00Z` });
+      if (estado === "pagado") Object.assign(cambios, { declarado_at: `2026-${String(mes + 1).padStart(2, "0")}-18T15:00:00Z`, folio_declaracion: `${8_000_000 + mes * 1000 + clave.length}`, monto_pagado: r.resultado!.totalAPagar });
+      revisar(await db.from("f29_propuestas").update(cambios).eq("empresa_id", empresaId).eq("anio", 2026).eq("mes", mes), "estado F29");
+    }
   }
 
   console.log("Listo. Ingresa con RUT 15.111.222-6 y clave Demo1234 (Ana Demo).");

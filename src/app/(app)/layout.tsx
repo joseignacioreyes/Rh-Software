@@ -18,8 +18,12 @@ export default async function LayoutApp({ children }: LayoutProps<"/">) {
   const contador = esContador(ctx);
   const verContabilidad = ctx.empresa ? permiso(ctx, ctx.empresa.id, "contabilidad").ver : false;
   const verLibros = ctx.empresa ? permiso(ctx, ctx.empresa.id, "libros").ver : false;
+  const verImpuestos = ctx.empresa ? permiso(ctx, ctx.empresa.id, "impuestos").ver : false;
 
-  const grupos: GrupoMenu[] = [{ items: [{ href: "/mi-mes", texto: "Mi mes" }] }];
+  const grupos: GrupoMenu[] = [{ items: [{ href: "/mi-mes", texto: "Mi mes" }, { href: "/impuestos/calendario", texto: "Calendario" }] }];
+  if (verImpuestos) {
+    grupos.push({ titulo: "Impuestos", items: [{ href: "/impuestos/f29", texto: "F29 del mes" }] });
+  }
   if (verLibros) {
     grupos.push({
       titulo: "Libros",

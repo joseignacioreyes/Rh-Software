@@ -12,12 +12,12 @@ export function BarraLateral({ grupos }: { grupos: GrupoMenu[] }) {
   const ruta = usePathname();
   return (
     <aside className="flex w-56 shrink-0 flex-col bg-azul text-blue-100">
-      <Link href="/mi-mes" className="px-4 py-4" aria-label="Ir a Mi mes">
+      <Link href="/mi-mes" className="px-4 py-3" aria-label="Ir a Mi mes">
         <Logo sobreAzul />
       </Link>
       <nav className="flex-1 overflow-y-auto px-2 pb-4" aria-label="Navegación principal">
         {grupos.map((g, i) => (
-          <div key={g.titulo ?? i} className="mt-3">
+          <div key={g.titulo ?? i} className="mt-2.5">
             {g.titulo && (
               <p className="px-2 pb-1 text-[11px] font-semibold tracking-wider text-blue-300 uppercase">{g.titulo}</p>
             )}
@@ -29,7 +29,7 @@ export function BarraLateral({ grupos }: { grupos: GrupoMenu[] }) {
                     <Link
                       href={it.href}
                       aria-current={activo ? "page" : undefined}
-                      className={`flex items-center justify-between rounded-md px-2 py-1.5 text-sm ${
+                      className={`flex items-center justify-between rounded-md px-2 py-1 text-sm ${
                         activo ? "bg-white/15 font-semibold text-white" : "hover:bg-white/10 hover:text-white"
                       }`}
                     >
