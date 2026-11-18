@@ -1,0 +1,58 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RH Software · Fase 3</title>
+<style>
+  :root{--azul:#1E3A8A;--verde:#059669;--celeste:#DBEAFE;--texto:#111827;--suave:#4B5563;--fondo:#F9FAFB}
+  body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--fondo);color:var(--texto)}
+  header{background:var(--azul);color:#fff;padding:24px 32px} header h1{margin:0;font-size:26px} header p{margin:6px 0 0;opacity:.9;max-width:900px}
+  main{max-width:1200px;margin:0 auto;padding:24px 32px}
+  h2{color:var(--azul);margin-top:32px}
+  figure{background:#fff;border:1px solid #E5E7EB;border-radius:10px;margin:0 0 24px;padding:16px}
+  figcaption{font-size:15px;margin-bottom:12px;line-height:1.5} .n{display:inline-block;background:var(--azul);color:#fff;border-radius:999px;width:24px;height:24px;text-align:center;line-height:24px;font-size:13px;margin-right:6px}
+  img{width:100%;border:1px solid #E5E7EB;border-radius:6px} img.cel{width:auto;max-width:390px;max-height:844px}
+  video{width:100%;border-radius:8px;border:1px solid #E5E7EB;background:#000}
+  li{margin:6px 0;line-height:1.5} a{color:var(--azul)}
+  .nav{margin-top:12px} .nav a{color:#fff;margin-right:14px;font-size:14px}
+</style></head><body>
+<header><h1>Fase 3: Importar y exportar libros</h1><p>RCV del SII con subida múltiple (detecta empresa y periodo de cada archivo), honorarios, asistente de mapeo para Excel de otros softwares, cartolas y conciliación, centralizaciones automáticas y exportaciones (Excel, PDF, CSV del importador del SII y ZIP anual).</p>
+<div class="nav"><a href="../fase-1/index.html">Fase 1</a><a href="../fase-2/index.html">Fase 2</a><a href="../fase-3/index.html">Fase 3</a><a href="../fase-4/index.html">Fase 4</a><a href="../fase-5/index.html">Fase 5</a><a href="../fase-6/index.html">Fase 6</a><a href="../fase-7/index.html">Fase 7</a><a href="../fase-8/index.html">Fase 8</a></div></header>
+<main>
+<h2>Recorrido en video</h2><video src="recorrido.webm" controls preload="metadata"></video>
+<h2>Pantallas en orden de uso</h2>
+    <figure>
+      <figcaption><span class="n">1</span> Importar del SII: arrastra varios archivos de varias empresas a la vez. RH Software detecta la empresa y el periodo de cada uno.</figcaption>
+      <a href="01-importar-vacio.png"><img src="01-importar-vacio.png" alt="01-importar-vacio.png" loading="lazy" class=""></a>
+    </figure>
+    <figure>
+      <figcaption><span class="n">2</span> Vista previa antes de guardar: empresa y periodo detectados, documentos nuevos y duplicados (por tipo, folio y RUT), y RUT inválidos marcados.</figcaption>
+      <a href="02-importar-revision.png"><img src="02-importar-revision.png" alt="02-importar-revision.png" loading="lazy" class=""></a>
+    </figure>
+    <figure>
+      <figcaption><span class="n">3</span> Éxito: los libros de octubre de Transportes Cordillera quedan importados.</figcaption>
+      <a href="03-importar-exito.png"><img src="03-importar-exito.png" alt="03-importar-exito.png" loading="lazy" class=""></a>
+    </figure>
+    <figure>
+      <figcaption><span class="n">4</span> Libro de compras con totales, filtros y exportación (Excel, PDF, CSV y formato del importador del SII).</figcaption>
+      <a href="04-libro-compras.png"><img src="04-libro-compras.png" alt="04-libro-compras.png" loading="lazy" class=""></a>
+    </figure>
+    <figure>
+      <figcaption><span class="n">5</span> Libro de ventas (incluye el resumen de boletas del Almacén).</figcaption>
+      <a href="05-libro-ventas.png"><img src="05-libro-ventas.png" alt="05-libro-ventas.png" loading="lazy" class=""></a>
+    </figure>
+    <figure>
+      <figcaption><span class="n">6</span> Libro de honorarios recibidos de Consultora Andes, con la retención que va al F29.</figcaption>
+      <a href="06-honorarios.png"><img src="06-honorarios.png" alt="06-honorarios.png" loading="lazy" class=""></a>
+    </figure>
+    <figure>
+      <figcaption><span class="n">7</span> Asistente de mapeo: sube un Excel de otro software y dile qué columna es el folio, el neto… (con sugerencias de IA cuando se active la clave). El mapeo se guarda.</figcaption>
+      <a href="07-mapeo-otros-softwares.png"><img src="07-mapeo-otros-softwares.png" alt="07-mapeo-otros-softwares.png" loading="lazy" class=""></a>
+    </figure>
+    <figure>
+      <figcaption><span class="n">8</span> Cartolas y conciliación: pareos sugeridos automáticamente y diferencias marcadas.</figcaption>
+      <a href="08-bancos-conciliacion.png"><img src="08-bancos-conciliacion.png" alt="08-bancos-conciliacion.png" loading="lazy" class=""></a>
+    </figure>
+    <figure>
+      <figcaption><span class="n">9</span> Centralizaciones automáticas (compras, ventas, honorarios y remuneraciones) con cuentas configuradas una vez por empresa.</figcaption>
+      <a href="09-centralizaciones.png"><img src="09-centralizaciones.png" alt="09-centralizaciones.png" loading="lazy" class=""></a>
+    </figure>
+<h2>Archivos de ejemplo generados</h2><ul><li><a href="archivos/libro_compras_76111222-8_202610.xlsx">libro_compras_76111222-8_202610.xlsx</a> — Libro de compras de octubre en Excel.</li><li><a href="archivos/libro_compras_76111222-8_202610.pdf">libro_compras_76111222-8_202610.pdf</a> — Libro de compras en PDF.</li><li><a href="archivos/libro_ventas_importador_sii_76111222-8_202610.csv">libro_ventas_importador_sii_76111222-8_202610.csv</a> — Libro de ventas en el CSV (punto y coma) del importador de libros del SII.</li><li><a href="archivos/libro_honorarios_recibidas_76333444-9_202610.xlsx">libro_honorarios_recibidas_76333444-9_202610.xlsx</a> — Libro de honorarios recibidos en Excel.</li><li><a href="archivos/rhsoftware_76111222-8_2026.zip">rhsoftware_76111222-8_2026.zip</a> — Exportación completa del año en ZIP (respaldo o cambio de contador).</li></ul><h2>Qué debe verificar la socia contadora</h2><ol><li>Que el CSV del SII de prueba tenga las mismas columnas que los que ella descarga (comparar con un archivo real).</li><li>Las cuentas de las centralizaciones.</li></ol>
+</main></body></html>

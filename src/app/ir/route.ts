@@ -6,6 +6,11 @@ import { COOKIE_EMPRESA, COOKIE_PERIODO } from "@/lib/sesion";
  * Cambia la empresa (y el periodo) de trabajo y lleva a la pantalla. Lo usa "Mi mes".
  */
 export function GET(request: NextRequest) {
+  // Una precarga del navegador (prefetch) NO debe cambiar la empresa de trabajo: solo un clic real.
+  const h = request.headers;
+  if (h.get("next-router-prefetch") || h.get("sec-purpose")?.includes("prefetch") || h.get("purpose") === "prefetch") {
+    return new NextResponse(null, { status: 204 });
+  }
   const p = request.nextUrl.searchParams;
   const a = p.get("a") ?? "/mi-mes";
   // Solo rutas internas.

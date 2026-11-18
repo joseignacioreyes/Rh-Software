@@ -93,7 +93,7 @@ export default async function MiMes() {
                 return (
                   <tr key={empresa.id} className={`border-t border-borde ${ctx.empresa?.id === empresa.id ? "bg-celeste/40" : ""}`}>
                     <td className="px-4 py-2.5">
-                      <Link href={`/ir?empresa=${empresa.id}&a=/empresas/${empresa.id}`} className="font-medium text-texto hover:text-azul hover:underline">{empresa.razon_social}</Link>
+                      <a href={`/ir?empresa=${empresa.id}&a=/empresas/${empresa.id}`} className="font-medium text-texto hover:text-azul hover:underline">{empresa.razon_social}</a>
                       <div className="numeros text-xs text-texto-suave">{formatearRut(empresa.rut)}</div>
                     </td>
                     {TAREAS.map((t) => {
@@ -107,7 +107,7 @@ export default async function MiMes() {
                       return (
                         <td key={t.clave} className="px-2 py-2.5 text-center" title={`${ESTILO[s.estado].texto}: ${s.detalle}`}>
                           {s.href ? (
-                            <Link href={`/ir?empresa=${empresa.id}&periodo=${clavePeriodo}&a=${s.href}`} className="inline-block rounded p-1 hover:bg-celeste">{punto}</Link>
+                            <a href={`/ir?empresa=${empresa.id}&periodo=${clavePeriodo}&a=${s.href}`} className="inline-block rounded p-1 hover:bg-celeste">{punto}</a>
                           ) : punto}
                         </td>
                       );

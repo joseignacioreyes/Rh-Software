@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { obtenerContexto, nombrePeriodo, permiso, MODULOS } from "@/lib/sesion";
 import { clienteServidor } from "@/lib/supabase/servidor";
 import { estadoDelMes } from "@/lib/servicios/estado-mes";
@@ -60,7 +59,7 @@ export default async function Calendario() {
                   <td className="numeros px-3 py-1.5 whitespace-nowrap">{formatoFecha(new Date(`${f.fecha}T12:00:00-04:00`))}</td>
                   <td className="px-3 py-1.5 font-medium">{f.que}</td>
                   <td className="px-3 py-1.5">
-                    <Link href={`/ir?empresa=${f.empresa.id}&periodo=${clavePeriodo}&a=${RUTA[f.que]?.href ?? "/mi-mes"}`} className="hover:text-azul hover:underline">{f.empresa.razon_social}</Link>
+                    <a href={`/ir?empresa=${f.empresa.id}&periodo=${clavePeriodo}&a=${RUTA[f.que]?.href ?? "/mi-mes"}`} className="hover:text-azul hover:underline">{f.empresa.razon_social}</a>
                   </td>
                   <td className="px-3 py-1.5">
                     {listo ? <Etiqueta tono="verde">Listo</Etiqueta> : d < 0 ? <Etiqueta tono="rojo">Atrasado {-d} días</Etiqueta> : d <= 5 ? <Etiqueta tono="ambar">Vence en {d} días</Etiqueta> : <Etiqueta tono="gris">Faltan {d} días</Etiqueta>}

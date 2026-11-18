@@ -1,0 +1,42 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RH Software · Fase 4</title>
+<style>
+  :root{--azul:#1E3A8A;--verde:#059669;--celeste:#DBEAFE;--texto:#111827;--suave:#4B5563;--fondo:#F9FAFB}
+  body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--fondo);color:var(--texto)}
+  header{background:var(--azul);color:#fff;padding:24px 32px} header h1{margin:0;font-size:26px} header p{margin:6px 0 0;opacity:.9;max-width:900px}
+  main{max-width:1200px;margin:0 auto;padding:24px 32px}
+  h2{color:var(--azul);margin-top:32px}
+  figure{background:#fff;border:1px solid #E5E7EB;border-radius:10px;margin:0 0 24px;padding:16px}
+  figcaption{font-size:15px;margin-bottom:12px;line-height:1.5} .n{display:inline-block;background:var(--azul);color:#fff;border-radius:999px;width:24px;height:24px;text-align:center;line-height:24px;font-size:13px;margin-right:6px}
+  img{width:100%;border:1px solid #E5E7EB;border-radius:6px} img.cel{width:auto;max-width:390px;max-height:844px}
+  video{width:100%;border-radius:8px;border:1px solid #E5E7EB;background:#000}
+  li{margin:6px 0;line-height:1.5} a{color:var(--azul)}
+  .nav{margin-top:12px} .nav a{color:#fff;margin-right:14px;font-size:14px}
+</style></head><body>
+<header><h1>Fase 4: Impuestos y panel “Mi mes”</h1><p>Propuesta de F29 calculada desde los libros, lado a lado con la del SII y con las diferencias explicadas; calendario de vencimientos; panel “Mi mes” con semáforos y procesos masivos.</p>
+<div class="nav"><a href="../fase-1/index.html">Fase 1</a><a href="../fase-2/index.html">Fase 2</a><a href="../fase-3/index.html">Fase 3</a><a href="../fase-4/index.html">Fase 4</a><a href="../fase-5/index.html">Fase 5</a><a href="../fase-6/index.html">Fase 6</a><a href="../fase-7/index.html">Fase 7</a><a href="../fase-8/index.html">Fase 8</a></div></header>
+<main>
+<h2>Recorrido en video</h2><video src="recorrido.webm" controls preload="metadata"></video>
+<h2>Pantallas en orden de uso</h2>
+    <figure>
+      <figcaption><span class="n">1</span> “Mi mes”: todas las empresas con un semáforo por tarea (libros, comprobantes, F29, remuneraciones, Previred, LRE, documentos). Cada celda lleva a la tarea. Avisos útiles abajo.</figcaption>
+      <a href="01-mi-mes.png"><img src="01-mi-mes.png" alt="01-mi-mes.png" loading="lazy" class=""></a>
+    </figure>
+    <figure>
+      <figcaption><span class="n">2</span> Proceso masivo: “Calcular F29 de todas mis empresas” con barra de avance y resumen de errores por empresa.</figcaption>
+      <a href="02-mi-mes-masivo.png"><img src="02-mi-mes-masivo.png" alt="02-mi-mes-masivo.png" loading="lazy" class=""></a>
+    </figure>
+    <figure>
+      <figcaption><span class="n">3</span> F29 del Almacén: IVA débito y crédito, remanente, PPM, retenciones e impuesto único, con “Ver cómo se calculó” y la propuesta del SII al lado.</figcaption>
+      <a href="03-f29.png"><img src="03-f29.png" alt="03-f29.png" loading="lazy" class=""></a>
+    </figure>
+    <figure>
+      <figcaption><span class="n">4</span> Estado vacío / por revisar: Transportes aún no tiene F29 de octubre calculado.</figcaption>
+      <a href="04-f29-sin-libros.png"><img src="04-f29-sin-libros.png" alt="04-f29-sin-libros.png" loading="lazy" class=""></a>
+    </figure>
+    <figure>
+      <figcaption><span class="n">5</span> Calendario tributario y laboral por empresa: F29, Previred, LRE y declaraciones juradas. Las fechas salen de la tabla de parámetros.</figcaption>
+      <a href="05-calendario.png"><img src="05-calendario.png" alt="05-calendario.png" loading="lazy" class=""></a>
+    </figure>
+<h2>Qué debe verificar la socia contadora</h2><ol><li>El cálculo del F29 del Almacén y de Consultora Andes de octubre (códigos y montos).</li><li>Los días de vencimiento del F29 (20 con factura electrónica, 12 sin ella) y los feriados.</li></ol>
+</main></body></html>

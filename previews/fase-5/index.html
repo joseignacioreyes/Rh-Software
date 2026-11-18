@@ -1,0 +1,46 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RH Software · Fase 5</title>
+<style>
+  :root{--azul:#1E3A8A;--verde:#059669;--celeste:#DBEAFE;--texto:#111827;--suave:#4B5563;--fondo:#F9FAFB}
+  body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--fondo);color:var(--texto)}
+  header{background:var(--azul);color:#fff;padding:24px 32px} header h1{margin:0;font-size:26px} header p{margin:6px 0 0;opacity:.9;max-width:900px}
+  main{max-width:1200px;margin:0 auto;padding:24px 32px}
+  h2{color:var(--azul);margin-top:32px}
+  figure{background:#fff;border:1px solid #E5E7EB;border-radius:10px;margin:0 0 24px;padding:16px}
+  figcaption{font-size:15px;margin-bottom:12px;line-height:1.5} .n{display:inline-block;background:var(--azul);color:#fff;border-radius:999px;width:24px;height:24px;text-align:center;line-height:24px;font-size:13px;margin-right:6px}
+  img{width:100%;border:1px solid #E5E7EB;border-radius:6px} img.cel{width:auto;max-width:390px;max-height:844px}
+  video{width:100%;border-radius:8px;border:1px solid #E5E7EB;background:#000}
+  li{margin:6px 0;line-height:1.5} a{color:var(--azul)}
+  .nav{margin-top:12px} .nav a{color:#fff;margin-right:14px;font-size:14px}
+</style></head><body>
+<header><h1>Fase 5: Remuneraciones I</h1><p>Parámetros legales con fuente y vigencia, trabajadores, liquidaciones con “Ver cómo se calculó” en cada línea, proceso masivo con alertas y PDF de la liquidación.</p>
+<div class="nav"><a href="../fase-1/index.html">Fase 1</a><a href="../fase-2/index.html">Fase 2</a><a href="../fase-3/index.html">Fase 3</a><a href="../fase-4/index.html">Fase 4</a><a href="../fase-5/index.html">Fase 5</a><a href="../fase-6/index.html">Fase 6</a><a href="../fase-7/index.html">Fase 7</a><a href="../fase-8/index.html">Fase 8</a></div></header>
+<main>
+<h2>Recorrido en video</h2><video src="recorrido.webm" controls preload="metadata"></video>
+<h2>Pantallas en orden de uso</h2>
+    <figure>
+      <figcaption><span class="n">1</span> Parámetros legales: valor, vigencia, fuente oficial y estado (POR VERIFICAR hasta que la socia los revise).</figcaption>
+      <a href="01-parametros.png"><img src="01-parametros.png" alt="01-parametros.png" loading="lazy" class=""></a>
+    </figure>
+    <figure>
+      <figcaption><span class="n">2</span> Trabajadores de Transportes Cordillera: los 5 casos de prueba (horas extra, licencia, Isapre en UF, plazo fijo, ingreso a mitad de mes).</figcaption>
+      <a href="02-trabajadores.png"><img src="02-trabajadores.png" alt="02-trabajadores.png" loading="lazy" class=""></a>
+    </figure>
+    <figure>
+      <figcaption><span class="n">3</span> Estado vacío: noviembre aún no se calcula. Un botón calcula todas las liquidaciones de la empresa.</figcaption>
+      <a href="03-liquidaciones-por-calcular.png"><img src="03-liquidaciones-por-calcular.png" alt="03-liquidaciones-por-calcular.png" loading="lazy" class=""></a>
+    </figure>
+    <figure>
+      <figcaption><span class="n">4</span> Éxito: liquidaciones calculadas con el resumen de alertas (por ejemplo, datos que faltan).</figcaption>
+      <a href="04-liquidaciones-calculadas.png"><img src="04-liquidaciones-calculadas.png" alt="04-liquidaciones-calculadas.png" loading="lazy" class=""></a>
+    </figure>
+    <figure>
+      <figcaption><span class="n">5</span> Liquidación con “Ver cómo se calculó” abierto en el impuesto único: fórmula, parámetros con su vigencia y la fuente.</figcaption>
+      <a href="05-liquidacion-detalle.png"><img src="05-liquidacion-detalle.png" alt="05-liquidacion-detalle.png" loading="lazy" class=""></a>
+    </figure>
+    <figure>
+      <figcaption><span class="n">6</span> Ficha del trabajador: AFP, salud, contrato, jornada, sueldo base y cargas.</figcaption>
+      <a href="06-ficha-trabajador.png"><img src="06-ficha-trabajador.png" alt="06-ficha-trabajador.png" loading="lazy" class=""></a>
+    </figure>
+<h2>Archivos de ejemplo generados</h2><ul><li><a href="archivos/liquidacion-ejemplo-octubre-2026.pdf">liquidacion-ejemplo-octubre-2026.pdf</a> — Liquidación de sueldo en PDF, lista para firmar.</li></ul><h2>Qué debe verificar la socia contadora</h2><ol><li>Todos los parámetros marcados POR VERIFICAR (UF, UTM, topes, tasas AFP, SIS, Reforma de Pensiones, tabla del impuesto único, asignación familiar).</li><li>Los casos de prueba de docs/remuneraciones/casos-de-prueba.md: cada liquidación debe cuadrar al peso con un cálculo hecho a mano o con un simulador oficial.</li></ol>
+</main></body></html>
