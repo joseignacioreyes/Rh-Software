@@ -27,17 +27,17 @@ export function ProcesosMasivos({ empresas, periodo }: {
   async function correr(titulo: string, ejecutar: (typeof todas)[number]["ejecutar"]) {
     setCorriendo(titulo);
     setAvance(0);
-    const lista: Resultado[] = [];
-    setResultados(lista);
+    let lista: Resultado[] = [];
+    setResultados([]);
     for (let i = 0; i < empresas.length; i++) {
       const e = empresas[i];
       try {
         const r = await ejecutar(e.id, periodo);
-        lista.push({ nombre: e.nombre, ...r });
+        lista = [...lista, { nombre: e.nombre, ...r }];
       } catch (err) {
-        lista.push({ nombre: e.nombre, error: (err as Error).message });
+        lista = [...lista, { nombre: e.nombre, error: (err as Error).message }];
       }
-      setResultados([...lista]);
+      setResultados(lista);
       setAvance(i + 1);
     }
     setCorriendo(null);
