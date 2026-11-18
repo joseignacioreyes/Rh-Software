@@ -169,6 +169,42 @@ describe("portal del cliente y bandeja", () => {
   });
 });
 
+describe("suscripción: solo lectura por atraso y límite del plan", () => {
+  it("con el pago atrasado se puede ver todo pero no modificar, y sí informar un pago", async () => {
+    await admin.from("suscripciones").upsert({ estudio_id: DEMO.estudio.id, plan: "inicial", estado: "activa", pagado_hasta: "2026-01-31", dias_gracia: 10 });
+    try {
+      const ver = await ana.from("empresas").select("id");
+      expect(ver.data).toHaveLength(3);
+      const c = await ana.from("centros_costo").insert({ estudio_id: DEMO.estudio.id, empresa_id: DEMO.empresas.almacen, codigo: "ZZ", nombre: "Prueba" });
+      expect(c.error).not.toBeNull();
+      const e = await ana.from("empresas").update({ giro: "cambio" }).eq("id", DEMO.empresas.almacen).select("id");
+      expect(e.data ?? []).toEqual([]);
+      const p = await ana.from("pagos_suscripcion").insert({ estudio_id: DEMO.estudio.id, plan: "inicial", monto: 29990, fecha_transferencia: "2026-11-18" });
+      expect(p.error).toBeNull();
+      const aprobar = await ana.rpc("aprobar_pago", { p_pago: "00000000-0000-4000-8000-000000000000" });
+      expect(aprobar.error).not.toBeNull(); // solo el superadministrador aprueba
+    } finally {
+      await admin.from("pagos_suscripcion").delete().eq("estudio_id", DEMO.estudio.id);
+      await admin.from("suscripciones").delete().eq("estudio_id", DEMO.estudio.id);
+    }
+  });
+  it("no se pueden crear más empresas que las del plan", async () => {
+    await admin.from("planes").upsert({ codigo: "prueba3", nombre: "Prueba", max_empresas: 3, precio_mensual: 0, activo: false });
+    await admin.from("suscripciones").upsert({ estudio_id: DEMO.estudio.id, plan: "prueba3", estado: "activa", pagado_hasta: "2099-12-31" });
+    try {
+      const r = await ana.from("empresas").insert({ estudio_id: DEMO.estudio.id, rut: "96555444-0", razon_social: "Cuarta Empresa SpA" });
+      expect(r.error?.message).toContain("Tu plan permite 3 empresas");
+    } finally {
+      await admin.from("suscripciones").delete().eq("estudio_id", DEMO.estudio.id);
+      await admin.from("planes").delete().eq("codigo", "prueba3");
+    }
+  });
+  it("un estudio no ve la suscripción ni los pagos de otro", async () => {
+    const { data } = await ajeno.from("pagos_suscripcion").select("id").eq("estudio_id", DEMO.estudio.id);
+    expect(data).toEqual([]);
+  });
+});
+
 describe("superadministrador", () => {
   it("no ve la contabilidad de las empresas sin autorización registrada", async () => {
     const e = await superadmin.from("empresas").select("id");

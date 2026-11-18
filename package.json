@@ -12,7 +12,8 @@
     "previews:fase-0": "node scripts/previews/fase-0.mjs",
     "seed:demo": "tsx --env-file-if-exists=.env.local scripts/seed-demo.ts",
     "test": "node --env-file-if-exists=.env.local node_modules/vitest/vitest.mjs run",
-    "db:reset": "supabase db reset && npm run seed:demo"
+    "db:reset": "supabase db reset && npm run seed:demo",
+    "crear:superadmin": "tsx --env-file-if-exists=.env.local scripts/crear-superadmin.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.10.0",

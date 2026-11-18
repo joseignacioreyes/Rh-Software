@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { clienteServidor } from "@/lib/supabase/servidor";
+import { estadoCuenta, type EstadoCuenta, type Suscripcion } from "@/lib/suscripcion";
 import { obtenerContexto, esContador, permiso, soloCliente } from "@/lib/sesion";
 import { BarraLateral, type GrupoMenu } from "@/components/app/BarraLateral";
 import { SelectorEmpresa } from "@/components/app/SelectorEmpresa";
@@ -18,6 +20,8 @@ export default async function LayoutApp({ children }: LayoutProps<"/">) {
   const ctx = await obtenerContexto();
   // Los clientes de las empresas usan el portal (más simple y apto para celular).
   if (soloCliente(ctx)) redirect("/portal");
+  // El superadministrador sin estudio propio trabaja en /admin (nunca ve la contabilidad de los estudios).
+  if (ctx.usuario.es_superadmin && !ctx.estudio) redirect("/admin");
   const contador = esContador(ctx);
   const verContabilidad = ctx.empresa ? permiso(ctx, ctx.empresa.id, "contabilidad").ver : false;
   const verLibros = ctx.empresa ? permiso(ctx, ctx.empresa.id, "libros").ver : false;
@@ -84,10 +88,22 @@ export default async function LayoutApp({ children }: LayoutProps<"/">) {
         ? [
             { href: "/estudio/usuarios", texto: "Usuarios y permisos" },
             { href: "/estudio/auditoria", texto: "Auditoría" },
+            { href: "/estudio/suscripcion", texto: "Plan y pagos" },
           ]
         : []),
     ],
   });
+
+  if (ctx.usuario.es_superadmin) grupos.push({ titulo: "RH Software", items: [{ href: "/admin", texto: "Administración" }] });
+
+  // Aviso de suscripción (prueba, por vencer, atrasada o solo lectura). El demo no tiene suscripción.
+  let aviso: EstadoCuenta | null = null;
+  if (ctx.estudio && !ctx.estudio.es_demo) {
+    const supabase = await clienteServidor();
+    const { data } = await supabase.from("suscripciones").select("plan, estado, pagado_hasta, dias_gracia").eq("estudio_id", ctx.estudio.id).maybeSingle();
+    aviso = estadoCuenta(data as Suscripcion | null);
+  }
+  const colorAviso: Record<string, string> = { prueba: "bg-celeste text-azul", por_vencer: "bg-amber-100 text-texto", atrasada: "bg-ambar text-white", solo_lectura: "bg-rojo text-white", cancelada: "bg-rojo text-white" };
 
   const rol = ctx.rolEstudio ?? ctx.membresiasEmpresa[0]?.rol ?? "";
 
@@ -101,6 +117,12 @@ export default async function LayoutApp({ children }: LayoutProps<"/">) {
             <Link href="/registro" className="rounded bg-white px-2 py-0.5 text-xs font-semibold text-ambar hover:bg-amber-50">
               Crear mi cuenta
             </Link>
+          </div>
+        )}
+        {aviso && aviso.codigo !== "al_dia" && (
+          <div className={`flex items-center justify-center gap-3 px-4 py-1.5 text-sm font-medium ${colorAviso[aviso.codigo]}`}>
+            {aviso.mensaje}
+            {contador && <Link href="/estudio/suscripcion" className="rounded bg-white px-2 py-0.5 text-xs font-semibold text-azul hover:bg-celeste">{aviso.codigo === "prueba" ? "Ver planes" : "Informar pago"}</Link>}
           </div>
         )}
         <header className="flex items-center gap-3 border-b border-borde bg-white px-4 py-2">
