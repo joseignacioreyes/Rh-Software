@@ -75,18 +75,20 @@ export default function Portada() {
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
           <Logo />
           <nav className="flex items-center gap-2 sm:gap-3">
-            <span
-              className="hidden cursor-not-allowed rounded-md px-3 py-2 text-sm font-medium text-texto-suave sm:inline"
-              title="Disponible en la Fase 1"
+            <Link
+              href="/ingresar"
+              className="hidden rounded-md px-3 py-2 text-sm font-medium text-azul hover:bg-celeste sm:inline"
             >
-              Ingresar (próximamente)
-            </span>
-            <span
-              className="cursor-not-allowed whitespace-nowrap rounded-md bg-azul/90 px-4 py-2 text-sm font-semibold text-white"
-              title="El estudio de ejemplo estará disponible en la Fase 1"
-            >
-              Ver demo<span className="hidden sm:inline"> · próximamente</span>
-            </span>
+              Ingresar
+            </Link>
+            <form action="/demo" method="post">
+              <button
+                type="submit"
+                className="whitespace-nowrap rounded-md bg-azul px-4 py-2 text-sm font-semibold text-white hover:bg-azul-oscuro"
+              >
+                Ver demo
+              </button>
+            </form>
           </nav>
         </div>
       </header>
@@ -113,7 +115,7 @@ export default function Portada() {
                   mensaje="Hola, quiero saber más de RH Software para mi estudio contable."
                   texto="Conversemos por WhatsApp"
                 />
-                <span className="text-sm text-texto-suave">Estamos construyéndolo. Pronto podrás probar el demo.</span>
+                <form action="/demo" method="post"><button type="submit" className="rounded-md border border-azul px-5 py-3 text-sm font-semibold text-azul hover:bg-celeste">Ver el estudio de ejemplo</button></form>
               </div>
             </div>
 
