@@ -31,6 +31,13 @@ export async function calcularLiquidacionesEmpresa(
     supabase.from("empresas").select("tasa_cotizacion_adicional").eq("id", empresaId).single(),
     Parametros.cargar(supabase),
   ]);
+  const { data: licencias } = await supabase.from("licencias").select("trabajador_id, desde, hasta").eq("empresa_id", empresaId).lte("desde", fin).gte("hasta", inicio);
+  const diasLicencia = (trabajadorId: string) =>
+    (licencias ?? []).filter((l) => l.trabajador_id === trabajadorId).reduce((s, l) => {
+      const a = Math.max(Date.parse(inicio), Date.parse(l.desde));
+      const b = Math.min(Date.parse(fin), Date.parse(l.hasta));
+      return s + (b >= a ? Math.round((b - a) / 86400000) + 1 : 0);
+    }, 0);
   const resumen: ResumenCalculo = { calculadas: 0, omitidas: 0, alertas: [], errores: [] };
   if (!trabajadores?.length) {
     resumen.alertas.push({ tono: "ambar", texto: "La empresa no tiene trabajadores con contrato vigente en el mes." });
@@ -47,7 +54,10 @@ export async function calcularLiquidacionesEmpresa(
     const n = novedades?.find((x) => x.trabajador_id === t.id);
     const nov: NovedadesMes = n
       ? { horas_extra: Number(n.horas_extra), dias_licencia: n.dias_licencia, dias_ausencia: n.dias_ausencia, bono_imponible: Number(n.bono_imponible), comisiones: Number(n.comisiones), bono_no_imponible: Number(n.bono_no_imponible), anticipo: Number(n.anticipo), prestamo: Number(n.prestamo), cuota_sindical: Number(n.cuota_sindical), apv: Number(n.apv), otros_descuentos: Number(n.otros_descuentos) }
-      : NOVEDADES_VACIAS;
+      : { ...NOVEDADES_VACIAS };
+    // Las licencias registradas cuentan si la novedad no informa días (tope 30, mes comercial).
+    const lic = Math.min(diasLicencia(t.id), 30);
+    if (lic > nov.dias_licencia) nov.dias_licencia = lic;
     const ficha: FichaTrabajador = {
       ...t,
       nombre,

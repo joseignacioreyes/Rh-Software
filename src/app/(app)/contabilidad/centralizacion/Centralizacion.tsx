@@ -13,7 +13,7 @@ type Props = {
   config: Record<string, string>;
   opciones: { id: string; texto: string }[];
   definiciones: { clave: string; nombre: string; grupo: string }[];
-  libros: { que: "compras" | "ventas" | "honorarios"; titulo: string; documentos: number; total: number; previo: { id: string; numero: number } | null }[];
+  libros: { que: "compras" | "ventas" | "honorarios" | "remuneraciones"; titulo: string; documentos: number; total: number; previo: { id: string; numero: number } | null }[];
 };
 
 export function Centralizacion({ puedeEditar, configGuardada, config, opciones, definiciones, libros }: Props) {
@@ -33,7 +33,7 @@ export function Centralizacion({ puedeEditar, configGuardada, config, opciones, 
     <div className="space-y-4">
       {mensaje?.ok && <p className={claseExito}>{mensaje.ok}</p>}
       {mensaje?.error && <p className={claseError}>{mensaje.error}</p>}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
         {libros.map((l) => (
           <div key={l.que} className="rounded-lg border border-borde bg-white p-4">
             <h2 className="font-bold text-azul">{l.titulo}</h2>
@@ -68,8 +68,8 @@ export function Centralizacion({ puedeEditar, configGuardada, config, opciones, 
           Cuentas de destino {verConfig ? "▲" : "▼"}
         </button>
         {verConfig && (
-          <div className="grid grid-cols-3 gap-6 border-t border-borde p-4">
-            {["compras", "ventas", "honorarios"].map((g) => (
+          <div className="grid grid-cols-4 gap-6 border-t border-borde p-4">
+            {["compras", "ventas", "honorarios", "remuneraciones"].map((g) => (
               <div key={g} className="space-y-2">
                 <h3 className="text-sm font-semibold capitalize">{g}</h3>
                 {definiciones.filter((d) => d.grupo === g).map((d) => (
@@ -83,7 +83,7 @@ export function Centralizacion({ puedeEditar, configGuardada, config, opciones, 
               </div>
             ))}
             {puedeEditar && (
-              <div className="col-span-3">
+              <div className="col-span-4">
                 <button type="button" disabled={pendiente} className={claseBotonPrimario} onClick={() => ejecutar(guardarConfig(valores))}>Guardar cuentas</button>
               </div>
             )}

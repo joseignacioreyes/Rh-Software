@@ -247,7 +247,7 @@ async function main() {
       giro: "Venta al por menor en almacenes de barrio", actividades_economicas: ["472101"],
       direccion: "Av. Ficticia 123", comuna: "Maipú", representante_legal: "José Pérez Demo", rut_representante: "13444555-6",
       regimen: "propyme_transparente", inicio_actividades: "2019-03-01", tasa_ppm: 0.25, emite_factura_electronica: true,
-      organismo_16744: "ISL", tasa_cotizacion_adicional: 0, caja_compensacion: null,
+      organismo_16744: "ISL", tasa_cotizacion_adicional: 0, caja_compensacion: null, mutual: "isl", ccaf: null, region_lre: 13, comuna_lre: 13119,
       contacto_nombre: "José Pérez Demo", contacto_correo: "contacto@almacendonpepe.demo", contacto_whatsapp: "56900000001",
     },
     {
@@ -255,7 +255,7 @@ async function main() {
       giro: "Transporte de carga por carretera", actividades_economicas: ["492300"],
       direccion: "Camino Interior 4500", comuna: "Quilicura", representante_legal: "María Soto Demo", rut_representante: "14777666-7",
       regimen: "propyme_general", inicio_actividades: "2015-07-15", tasa_ppm: 1.0, emite_factura_electronica: true,
-      organismo_16744: "Mutual de Seguridad", tasa_cotizacion_adicional: 1.7, caja_compensacion: "Caja Demo",
+      organismo_16744: "Mutual de Seguridad", tasa_cotizacion_adicional: 1.7, caja_compensacion: "Caja Los Andes", mutual: "mutual_mutual", ccaf: "ccaf_losandes", region_lre: 13, comuna_lre: 13125,
       contacto_nombre: "María Soto Demo", contacto_correo: "administracion@cordillera.demo", contacto_whatsapp: "56900000002",
     },
     {
@@ -263,7 +263,7 @@ async function main() {
       giro: "Servicios de asesoría y consultoría", actividades_economicas: ["702000"],
       direccion: "Calle Imaginaria 77, of. 501", comuna: "Providencia", representante_legal: "Pedro Rojas Demo", rut_representante: "17888999-0",
       regimen: "propyme_general", inicio_actividades: "2021-01-04", tasa_ppm: 0.75, emite_factura_electronica: true,
-      organismo_16744: "ISL", tasa_cotizacion_adicional: 0, caja_compensacion: null,
+      organismo_16744: "ISL", tasa_cotizacion_adicional: 0, caja_compensacion: null, mutual: "isl", ccaf: null, region_lre: 13, comuna_lre: 13123,
       contacto_nombre: "Pedro Rojas Demo", contacto_correo: "pedro@consultoraandes.demo", contacto_whatsapp: "56900000003",
     },
   ];

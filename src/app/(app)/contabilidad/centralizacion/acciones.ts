@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { obtenerContexto, permiso, nombrePeriodo, rangoPeriodo } from "@/lib/sesion";
 import { clienteServidor } from "@/lib/supabase/servidor";
-import { CUENTAS_CENTRALIZACION, asientoCompras, asientoHonorarios, asientoVentas, type ConfigCuentas } from "@/lib/centralizacion";
+import { CUENTAS_CENTRALIZACION, asientoCompras, asientoHonorarios, asientoRemuneraciones, asientoVentas, type ConfigCuentas } from "@/lib/centralizacion";
 import { cargarHonorarios } from "@/lib/libros";
 
 async function verificar() {
@@ -26,14 +26,18 @@ export async function guardarConfig(cuentas: ConfigCuentas) {
 }
 
 /** Genera (o regenera) el comprobante de centralización del periodo. Si ya existía, el anterior queda anulado. */
-export async function centralizar(que: "compras" | "ventas" | "honorarios") {
+export async function centralizar(que: "compras" | "ventas" | "honorarios" | "remuneraciones") {
   try {
     const { ctx, empresa, supabase } = await verificar();
     const { data: conf } = await supabase.from("config_centralizacion").select("cuentas").eq("empresa_id", empresa.id).maybeSingle();
     const config = (conf?.cuentas ?? {}) as ConfigCuentas;
     const { hasta } = rangoPeriodo(ctx.periodo);
     let lineas;
-    if (que === "honorarios") {
+    if (que === "remuneraciones") {
+      const { data: liqs } = await supabase.from("liquidaciones").select("id, liquido, estado").eq("empresa_id", empresa.id).eq("anio", ctx.periodo.anio).eq("mes", ctx.periodo.mes).neq("estado", "anulada");
+      const { data: items } = await supabase.from("items_liquidacion").select("liquidacion_id, codigo, monto").in("liquidacion_id", (liqs ?? []).map((l) => l.id));
+      lineas = asientoRemuneraciones((liqs ?? []).map((l) => ({ liquido: Number(l.liquido), items: (items ?? []).filter((i) => i.liquidacion_id === l.id).map((i) => ({ codigo: i.codigo, monto: Number(i.monto) })) })), config);
+    } else if (que === "honorarios") {
       const { boletas } = await cargarHonorarios(supabase, empresa.id, "recibidas", ctx.periodo);
       lineas = asientoHonorarios(boletas.filter((b) => b.estado === "vigente"), config);
     } else {
@@ -48,7 +52,7 @@ export async function centralizar(que: "compras" | "ventas" | "honorarios") {
       p_empresa: empresa.id,
       p_origen: `centralizacion_${que}`,
       p_fecha: hasta,
-      p_glosa: `Centralización ${que === "honorarios" ? "boletas de honorarios" : `libro de ${que}`} ${nombrePeriodo(ctx.periodo).toLowerCase()}`,
+      p_glosa: `Centralización ${que === "honorarios" ? "boletas de honorarios" : que === "remuneraciones" ? "de remuneraciones" : `libro de ${que}`} ${nombrePeriodo(ctx.periodo).toLowerCase()}`,
       p_lineas: lineas,
     });
     if (error) return { error: error.message };

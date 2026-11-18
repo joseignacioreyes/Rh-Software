@@ -16,6 +16,16 @@ export const CUENTAS_CENTRALIZACION = [
   { clave: "honorarios_gasto", nombre: "Gasto en honorarios", codigo: "4.2.01.007", grupo: "honorarios" },
   { clave: "honorarios_retencion", nombre: "Retención de honorarios por pagar", codigo: "2.1.04.003", grupo: "honorarios" },
   { clave: "honorarios_por_pagar", nombre: "Honorarios por pagar", codigo: "2.1.02.004", grupo: "honorarios" },
+  { clave: "rem_sueldos", nombre: "Gasto sueldos (sueldo, horas extra, comisiones y bonos)", codigo: "4.2.01.001", grupo: "remuneraciones" },
+  { clave: "rem_gratificacion", nombre: "Gasto gratificaciones", codigo: "4.2.01.002", grupo: "remuneraciones" },
+  { clave: "rem_no_imponibles", nombre: "Gasto colación, movilización y no imponibles", codigo: "4.2.01.005", grupo: "remuneraciones" },
+  { clave: "rem_aportes", nombre: "Gasto aportes patronales", codigo: "4.2.01.004", grupo: "remuneraciones" },
+  { clave: "rem_por_pagar", nombre: "Remuneraciones por pagar (líquido)", codigo: "2.1.03.001", grupo: "remuneraciones" },
+  { clave: "rem_cotizaciones", nombre: "Cotizaciones previsionales por pagar", codigo: "2.1.03.002", grupo: "remuneraciones" },
+  { clave: "rem_impuesto", nombre: "Impuesto único por pagar", codigo: "2.1.04.002", grupo: "remuneraciones" },
+  { clave: "rem_anticipos", nombre: "Anticipos de sueldo", codigo: "1.1.03.006", grupo: "remuneraciones" },
+  { clave: "rem_prestamos", nombre: "Préstamos al personal", codigo: "1.1.03.005", grupo: "remuneraciones" },
+  { clave: "rem_otros", nombre: "Otros descuentos por pagar (sindicato, APV y otros)", codigo: "2.1.02.003", grupo: "remuneraciones" },
 ] as const;
 
 export type ClaveCuenta = (typeof CUENTAS_CENTRALIZACION)[number]["clave"];
@@ -80,4 +90,27 @@ export function asientoHonorarios(boletas: { monto_bruto: number; monto_retencio
     }
   }
   return a.lineas("Centralización boletas de honorarios recibidas");
+}
+
+type ItemsLiq = { codigo: string; monto: number }[];
+/**
+ * Centralización de remuneraciones del mes: gasto por concepto y aportes patronales al debe;
+ * líquido, cotizaciones (menos la asignación familiar, que el empleador recupera), impuesto y descuentos al haber.
+ */
+export function asientoRemuneraciones(liquidaciones: { items: ItemsLiq; liquido: number }[], config: ConfigCuentas) {
+  const a = new Asiento(config);
+  for (const l of liquidaciones) {
+    const m = (...c: string[]) => l.items.filter((i) => c.includes(i.codigo)).reduce((s, i) => s + i.monto, 0);
+    a.mover("rem_sueldos", m("sueldo_base", "horas_extra", "comisiones", "bono_imponible"));
+    a.mover("rem_gratificacion", m("gratificacion"));
+    a.mover("rem_no_imponibles", m("colacion", "movilizacion", "bono_no_imponible"));
+    a.mover("rem_aportes", m("sis", "afc_empleador", "ley_16744", "empleador_ci", "empleador_crp", "empleador_ev", "trabajo_pesado_empleador"));
+    a.mover("rem_por_pagar", -l.liquido);
+    a.mover("rem_cotizaciones", -(m("afp", "salud", "afc_trabajador", "trabajo_pesado") + m("sis", "afc_empleador", "ley_16744", "empleador_ci", "empleador_crp", "empleador_ev", "trabajo_pesado_empleador") - m("asignacion_familiar")));
+    a.mover("rem_impuesto", -m("impuesto_unico"));
+    a.mover("rem_anticipos", -m("anticipo"));
+    a.mover("rem_prestamos", -m("prestamo"));
+    a.mover("rem_otros", -m("cuota_sindical", "apv", "otros_descuentos"));
+  }
+  return a.lineas("Centralización de remuneraciones");
 }
