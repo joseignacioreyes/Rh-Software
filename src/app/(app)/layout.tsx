@@ -19,10 +19,21 @@ export default async function LayoutApp({ children }: LayoutProps<"/">) {
   const verContabilidad = ctx.empresa ? permiso(ctx, ctx.empresa.id, "contabilidad").ver : false;
   const verLibros = ctx.empresa ? permiso(ctx, ctx.empresa.id, "libros").ver : false;
   const verImpuestos = ctx.empresa ? permiso(ctx, ctx.empresa.id, "impuestos").ver : false;
+  const verRemuneraciones = ctx.empresa ? permiso(ctx, ctx.empresa.id, "remuneraciones").ver : false;
 
   const grupos: GrupoMenu[] = [{ items: [{ href: "/mi-mes", texto: "Mi mes" }, { href: "/impuestos/calendario", texto: "Calendario" }] }];
   if (verImpuestos) {
     grupos.push({ titulo: "Impuestos", items: [{ href: "/impuestos/f29", texto: "F29 del mes" }] });
+  }
+  if (verRemuneraciones) {
+    grupos.push({
+      titulo: "Remuneraciones",
+      items: [
+        { href: "/remuneraciones/liquidaciones", texto: "Liquidaciones del mes" },
+        { href: "/remuneraciones/trabajadores", texto: "Trabajadores" },
+        { href: "/remuneraciones/parametros", texto: "Parámetros legales" },
+      ],
+    });
   }
   if (verLibros) {
     grupos.push({

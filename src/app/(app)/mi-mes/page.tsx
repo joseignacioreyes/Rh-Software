@@ -40,6 +40,7 @@ export default async function MiMes() {
   const avisos = estados.flatMap((e) => e.avisos).sort((a, b) => (a.tono === b.tono ? 0 : a.tono === "rojo" ? -1 : 1));
   const conteo = (s: Semaforo) => estados.reduce((n, e) => n + Object.values(e.tareas).filter((t) => t.estado === s).length, 0);
   const puedeImpuestos = empresas.filter((e) => permiso(ctx, e.id, "impuestos").editar);
+  const puedeRemuneraciones = empresas.filter((e) => permiso(ctx, e.id, "remuneraciones").editar);
 
   return (
     <Pagina>
@@ -54,8 +55,12 @@ export default async function MiMes() {
         </div>
       </Encabezado>
 
-      {puedeImpuestos.length > 0 && (
-        <ProcesosMasivos empresas={puedeImpuestos.map((e) => ({ id: e.id, nombre: e.razon_social }))} periodo={ctx.periodo} />
+      {(puedeImpuestos.length > 0 || puedeRemuneraciones.length > 0) && (
+        <ProcesosMasivos
+          empresasImpuestos={puedeImpuestos.map((e) => ({ id: e.id, nombre: e.razon_social }))}
+          empresasRemuneraciones={puedeRemuneraciones.map((e) => ({ id: e.id, nombre: e.razon_social }))}
+          periodo={ctx.periodo}
+        />
       )}
 
       {avisos.length > 0 && (

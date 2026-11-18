@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { calcularF29Empresa } from "../impuestos/f29/acciones";
+import { calcularLiquidaciones } from "../remuneraciones/liquidaciones/acciones";
 import { formatoPesos } from "@/lib/formato";
 import { claseBotonSecundario } from "@/components/ui/estilos";
 import type { Periodo } from "@/lib/sesion";
@@ -13,8 +14,9 @@ type Resultado = { nombre: string; ok?: string; error?: string; total?: number; 
  * Procesos masivos: se ejecutan empresa por empresa con barra de avance y un resumen de errores.
  * (Las remuneraciones y Previred masivos se agregan en las fases 5 y 6.)
  */
-export function ProcesosMasivos({ empresas, periodo }: {
-  empresas: { id: string; nombre: string }[];
+export function ProcesosMasivos({ empresasImpuestos, empresasRemuneraciones, periodo }: {
+  empresasImpuestos: { id: string; nombre: string }[];
+  empresasRemuneraciones: { id: string; nombre: string }[];
   periodo: Periodo;
 }) {
   const router = useRouter();
@@ -22,9 +24,14 @@ export function ProcesosMasivos({ empresas, periodo }: {
   const [avance, setAvance] = useState(0);
   const [resultados, setResultados] = useState<Resultado[] | null>(null);
 
-  const todas = [{ titulo: "Calcular F29 de todas mis empresas", ejecutar: calcularF29Empresa }];
+  const todas = [
+    { titulo: "Calcular F29 de todas mis empresas", ejecutar: calcularF29Empresa, empresas: empresasImpuestos },
+    { titulo: "Generar liquidaciones de todas", ejecutar: calcularLiquidaciones, empresas: empresasRemuneraciones },
+  ].filter((a) => a.empresas.length > 0);
+  const [empresas, setEmpresas] = useState<{ id: string; nombre: string }[]>([]);
 
-  async function correr(titulo: string, ejecutar: (typeof todas)[number]["ejecutar"]) {
+  async function correr(titulo: string, ejecutar: (typeof todas)[number]["ejecutar"], empresas: { id: string; nombre: string }[]) {
+    setEmpresas(empresas);
     setCorriendo(titulo);
     setAvance(0);
     let lista: Resultado[] = [];
@@ -50,7 +57,7 @@ export function ProcesosMasivos({ empresas, periodo }: {
       <div className="flex flex-wrap items-center gap-2">
         <span className="text-sm font-semibold text-azul">Procesos masivos:</span>
         {todas.map((a) => (
-          <button key={a.titulo} type="button" disabled={!!corriendo} className={claseBotonSecundario} onClick={() => correr(a.titulo, a.ejecutar)}>
+          <button key={a.titulo} type="button" disabled={!!corriendo} className={claseBotonSecundario} onClick={() => correr(a.titulo, a.ejecutar, a.empresas)}>
             {a.titulo}
           </button>
         ))}

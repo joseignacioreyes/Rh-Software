@@ -11,6 +11,7 @@ import { aplicarMapeoCartola, sugerirMapeo } from "../src/lib/importar/mapeo";
 import { guardarCartola, guardarDocumentosRcv, guardarHonorarios } from "../src/lib/importar/guardar";
 import { CUENTAS_CENTRALIZACION } from "../src/lib/centralizacion";
 import { calcularYGuardarF29 } from "../src/lib/servicios/f29";
+import { calcularLiquidacionesEmpresa } from "../src/lib/servicios/liquidaciones";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const clave = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -367,6 +368,39 @@ async function main() {
     }), "config centralización");
 
     console.log(`  ${clave}: ${plantilla.length} cuentas, ${n} comprobantes, ${docsImportados} documentos RCV, ${movsOct.length} movimientos bancarios`);
+  }
+
+  // Trabajadores (ficticios). Casos: sueldo cercano al mínimo, horas extra, licencia médica,
+  // Isapre en UF, plazo fijo e ingreso a mitad de mes.
+  const T = (empresa: string, x: Record<string, unknown>) => ({
+    estudio_id: DEMO.estudio.id, empresa_id: empresa, nacionalidad: "Chilena", tipo_contrato: "indefinido", jornada_horas: 42,
+    gratificacion: "art50_mensual", colacion: 0, movilizacion: 0, salud: "fonasa", seguro_cesantia: true, cargas_familiares: 0,
+    forma_pago: "transferencia", consentimiento_whatsapp: false, telefono: null, plan_isapre_uf: null, fecha_termino: null, apellido_materno: null, created_by: DEMO.ana.id, ...x,
+  });
+  const trabajadores = [
+    T(DEMO.empresas.almacen, { rut: "18777888-3", nombres: "Rosa", apellido_paterno: "Demo", apellido_materno: "Fuentes", sexo: "F", fecha_nacimiento: "1985-04-12", cargo: "Cajera", fecha_ingreso: "2021-02-01", sueldo_base: 553553, colacion: 30000, afp: "afp_modelo", cargas_familiares: 1, telefono: "+56 9 0000 0011", consentimiento_whatsapp: true }),
+    T(DEMO.empresas.almacen, { rut: "19888999-7", nombres: "Jorge", apellido_paterno: "Demo", apellido_materno: "Pizarro", sexo: "M", fecha_nacimiento: "1999-09-03", cargo: "Reponedor", fecha_ingreso: "2023-05-15", sueldo_base: 560000, movilizacion: 25000, afp: "afp_habitat" }),
+    T(DEMO.empresas.transportes, { rut: "12111222-1", nombres: "Pedro", apellido_paterno: "Demo", apellido_materno: "Alarcón", sexo: "M", fecha_nacimiento: "1978-01-20", cargo: "Conductor", fecha_ingreso: "2018-06-01", sueldo_base: 850000, colacion: 35000, afp: "afp_provida", cargas_familiares: 2 }),
+    T(DEMO.empresas.transportes, { rut: "13222333-5", nombres: "Carla", apellido_paterno: "Demo", apellido_materno: "Vergara", sexo: "F", fecha_nacimiento: "1990-11-02", cargo: "Administrativa", fecha_ingreso: "2019-03-01", sueldo_base: 1100000, colacion: 35000, afp: "afp_capital", cargas_familiares: 1 }),
+    T(DEMO.empresas.transportes, { rut: "14333444-9", nombres: "Manuel", apellido_paterno: "Demo", apellido_materno: "Rojas", sexo: "M", fecha_nacimiento: "1980-07-15", cargo: "Jefe de operaciones", fecha_ingreso: "2016-01-04", sueldo_base: 2400000, colacion: 40000, movilizacion: 40000, afp: "afp_cuprum", salud: "isapre_banmedica", plan_isapre_uf: 5.8 }),
+    T(DEMO.empresas.transportes, { rut: "15444555-2", nombres: "Sofía", apellido_paterno: "Demo", apellido_materno: "Castro", sexo: "F", fecha_nacimiento: "2001-02-28", cargo: "Ayudante de bodega", tipo_contrato: "plazo_fijo", fecha_ingreso: "2026-08-01", fecha_termino: "2027-01-31", sueldo_base: 750000, afp: "afp_uno" }),
+    T(DEMO.empresas.transportes, { rut: "16555777-8", nombres: "Diego", apellido_paterno: "Demo", apellido_materno: "Muñoz", sexo: "M", fecha_nacimiento: "1995-06-10", cargo: "Conductor", fecha_ingreso: "2026-10-15", sueldo_base: 900000, colacion: 35000, afp: "afp_planvital" }),
+  ];
+  const creados = revisar<{ id: string; rut: string; empresa_id: string }[]>(await db.from("trabajadores").insert(trabajadores).select("id, rut, empresa_id"), "trabajadores");
+  const id = (rut: string) => creados.find((t) => t.rut === rut)!.id;
+  const N = (rut: string, empresa: string, mes: number, x: Record<string, unknown>) => ({ estudio_id: DEMO.estudio.id, empresa_id: empresa, trabajador_id: id(rut), anio: 2026, mes, horas_extra: 0, dias_licencia: 0, dias_ausencia: 0, bono_imponible: 0, anticipo: 0, ...x });
+  revisar(await db.from("novedades").insert([
+    N("12111222-1", DEMO.empresas.transportes, 10, { horas_extra: 12 }),
+    N("13222333-5", DEMO.empresas.transportes, 10, { dias_licencia: 7 }),
+    N("12111222-1", DEMO.empresas.transportes, 11, { horas_extra: 8 }),
+    N("13222333-5", DEMO.empresas.transportes, 11, { anticipo: 100000 }),
+    N("18777888-3", DEMO.empresas.almacen, 11, { bono_imponible: 20000 }),
+  ]), "novedades");
+  // Octubre: calculadas y aprobadas. Noviembre: novedades ingresadas, por calcular.
+  for (const empresa of [DEMO.empresas.almacen, DEMO.empresas.transportes]) {
+    const r = await calcularLiquidacionesEmpresa(db, empresa, DEMO.estudio.id, { anio: 2026, mes: 10 }, DEMO.ana.id);
+    if (r.errores.length) throw new Error(`Liquidaciones: ${r.errores.join("; ")}`);
+    revisar(await db.from("liquidaciones").update({ estado: "aprobada", aprobada_por: DEMO.ana.id, aprobada_at: "2026-11-05T15:00:00Z" }).eq("empresa_id", empresa).eq("anio", 2026).eq("mes", 10), "aprobar");
   }
 
   // F29: agosto y septiembre declarados y pagados; octubre según el caso de cada empresa.
